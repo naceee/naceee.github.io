@@ -2,9 +2,13 @@ import pandas as pd
 import plotly.graph_objects as go
 import plotly.express as px
 import numpy as np
+import matplotlib
+from heapq import nlargest
 
-PLAYERS = ["Peter", "Jernej", "Gašper", "Blaž", "Nace", "Martin Mica Kristina"]
-COLORS = ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd", "#8c564b"]
+PLAYERS = ["Peter", "Jernej", "Gašper", "Blaž", "Nace", "Ostali"]
+cmap = matplotlib.colormaps['Set2']
+COLORS = [f"rgb{(cmap(i)[0], cmap(i)[1], cmap(i)[2])}" for i in range(6)]
+print(COLORS)
 
 def all_time_leaderboard():
     data = pd.read_csv('data.csv')
@@ -35,7 +39,8 @@ def all_time_leaderboard():
         yaxis_title='Število točk',
         plot_bgcolor="white",
         showlegend=False,
-        margin=dict(r=100, t=50, b=50, l=50)
+        margin=dict(r=100, t=50, b=50, l=50),
+        yaxis={'side': 'right'}
     )
 
     # compute the end score for each player
@@ -50,7 +55,7 @@ def all_time_leaderboard():
         fig.add_annotation(
             x=data[f"{player}_games"].iloc[-1],
             y=y_positions[player],
-            text=f"{int(data[player].iloc[-1])}: {player}",
+            text=player,
             showarrow=False,
             yshift=10,
             xanchor="left",
@@ -60,6 +65,23 @@ def all_time_leaderboard():
             )
         )
 
+        ranking = end_scores.index.get_loc(player) + 1
+        print(player, ranking, 1 - (ranking - 1) / 10)
+        fig.add_annotation(
+            x=0,
+            y=1 - (ranking - 1) / 15,
+            text=f"{ranking}. {player}: {int(data[player].iloc[-1])} "
+                 f"({int(data[f'{player}_games'].iloc[-1])} iger)",
+            showarrow=False,
+            xref="paper",
+            yref="paper",
+            xanchor="left",
+            yanchor="top",
+            font=dict(
+                size=18,
+                color=COLORS[PLAYERS.index(player)]
+            )
+        )
 
     fig.show()
     fig.write_html("all_time_leaderboard.html")
@@ -83,6 +105,48 @@ def arrange_positions(end_scores, k=0.04):
         y_positions_dict[player] = last_y
     return y_positions_dict
 
+def number_of_places():
+    data = pd.read_csv('data.csv')
+    data = data[PLAYERS]
+    data = data.iloc[1:]
+    data = data.fillna(-np.inf)
+
+    def f(row):
+        x = nlargest(4, enumerate(row.to_list()), key=lambda x: x[1])
+        for i in range(4):
+            row[x[i][0]] = i + 1
+
+    data.apply(f, axis=1)
+    data = data.replace(-np.inf, np.nan)
+    # count the number of places for each player
+    data = data.apply(pd.value_counts)
+    # divide each column by its sum:
+    for player in PLAYERS:
+        data[player] = data[player] / data[player].sum()
+
+    players_with_wins = list(zip(list(data.iloc[0]), list(data.columns)))
+    players_with_wins.sort(reverse=True)
+    sorted_players = [p[1] for p in players_with_wins]
+    data = data[sorted_players]
+
+    colors = ["gold", "silver", "peru", "#edebe1"]
+
+    fig = go.Figure(go.Bar(x=sorted_players, y=data.iloc[0],
+                           name=f'1. mesto', marker_color=colors[0]))
+    for place in range(1, 4):
+        fig.add_trace(go.Bar(x=sorted_players, y=data.iloc[place], name=f'{place+1}. mesto',
+                             marker_color=colors[place]))
+
+    fig.update_layout(
+        barmode='stack',
+        plot_bgcolor="white",
+        yaxis={'visible': False},
+        title='Delež uvrstitev posameznika',
+    )
+    fig.show()
+    fig.write_html("number_of_wins.html")
+
 
 if __name__ == '__main__':
     all_time_leaderboard()
+    number_of_places()
