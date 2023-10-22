@@ -12,7 +12,7 @@
 }
 
 header h1 h2 h3{
-  font-family: Helvetica, sans-serif;
+  font-family: Arial, sans-serif;
   line-height: 1.2;
 }
 
@@ -23,5 +23,5 @@ body{
   font-size:18px;
   color:#444;
   padding: 0 10px;
-  background-color: rgb(215, 215, 215);
+  background-color: whitesmoke;
 }
