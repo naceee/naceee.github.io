@@ -5,10 +5,12 @@ import numpy as np
 import matplotlib
 from heapq import nlargest
 
-PLAYERS = ["Peter", "Jernej", "Gašper", "Blaž", "Nace", "Ostali"]
+
+PLAYERS = ["Peter", "Jernej", "Nace", "Gašper", "Blaž", "Ostali"]
 cmap = matplotlib.colormaps['Set2']
 COLORS = [f"rgb{(cmap(i)[0], cmap(i)[1], cmap(i)[2])}" for i in range(6)]
 print(COLORS)
+
 
 def all_time_leaderboard():
     data = pd.read_csv('data.csv')
@@ -84,7 +86,7 @@ def all_time_leaderboard():
         )
 
     fig.show()
-    fig.write_html("all_time_leaderboard.html")
+    fig.write_html("html_graphs/all_time_leaderboard.html")
 
 
 def arrange_positions(end_scores, k=0.04):
@@ -105,8 +107,136 @@ def arrange_positions(end_scores, k=0.04):
         y_positions_dict[player] = last_y
     return y_positions_dict
 
+
 def number_of_places():
     data = pd.read_csv('data.csv')
+    data = number_of_wins_df(data)
+    counts = data.sum(axis=0)
+    # make counts a dict with players as keys
+    counts = dict(counts)
+
+    # divide each column by its sum:
+    for player in PLAYERS:
+        data[player] = data[player] / data[player].sum()
+        # round to 2 decimals
+        data[player] = data[player].apply(lambda x: round(x * 100, 2))
+
+    players_with_wins = list(zip(list(data.iloc[0]), list(data.columns)))
+    players_with_wins.sort(reverse=True)
+    sorted_players = [p[1] for p in players_with_wins]
+    data = data[sorted_players]
+
+    colors = ["gold", "silver", "peru", "#edebe1"]
+
+    fig = go.Figure(go.Bar(x=sorted_players, y=data.iloc[0],
+                           name=f'1. mesto', marker_color=colors[0], hoverinfo="y"))
+    for place in range(1, 4):
+        fig.add_trace(go.Bar(x=sorted_players, y=data.iloc[place], name=f'{place+1}. mesto',
+                             marker_color=colors[place], hoverinfo="y"))
+    fig.update_xaxes(showticklabels=False)
+
+    for player in sorted_players:
+        fig.add_annotation(
+            x=player,
+            y=0,
+            xanchor="center",
+            yref="paper",
+            yanchor="top",
+            text=f"{player}<br>({counts[player]} iger)",
+            showarrow=False,
+            font=dict(size=14)
+        )
+
+    fig.update_layout(
+        barmode='stack',
+        plot_bgcolor="white",
+        yaxis={'visible': False},
+        title='Delež uvrstitev posameznika',
+    )
+    fig.show()
+    fig.write_html("html_graphs/number_of_wins.html")
+
+
+def head_to_head():
+    data = pd.read_csv('data.csv')
+    # for each player, count the number of wins against each other player
+    data = data[PLAYERS]
+    data = data.iloc[1:]
+    matrix = np.zeros((len(PLAYERS), len(PLAYERS)))
+
+    for p1 in PLAYERS:
+        for p2 in PLAYERS:
+            data[f"{p1}_{p2}"] = data[p1] > data[p2]
+            matrix[PLAYERS.index(p1), PLAYERS.index(p2)] = data[f"{p1}_{p2}"].sum()
+
+    for i in range(len(PLAYERS)):
+        matrix[i, i] = np.nan
+        for j in range(i + 1, len(PLAYERS)):
+            matrix[i, j] = matrix[i, j] / (matrix[i, j] + matrix[j, i])
+            matrix[j, i] = 1 - matrix[i, j]
+
+    matrix = matrix * 100
+
+    text = matrix.copy()
+    text = np.round(text, 1)
+    text = text.astype(str)
+    text[text == "nan"] = ""
+    for i in range(len(PLAYERS)):
+        for j in range(len(PLAYERS)):
+            if text[i, j] != "":
+                text[i, j] += "%"
+
+    # flip the matrix upside down
+    matrix = np.flip(matrix, axis=0)
+    text = np.flip(text, axis=0)
+
+    # Load xarray from dataset included in the xarray tutorial
+    fig = go.Figure(data=go.Heatmap(z=matrix, x=PLAYERS, y=PLAYERS[::-1],
+                    text=text, texttemplate="%{text}", textfont={"size": 16},
+                    colorscale='RdBu_r', reversescale=True))
+
+    fig.update_layout(
+        title='Kdo koga ponavadi nabije',
+        showlegend=False,
+        plot_bgcolor="white",
+        coloraxis_showscale=False,
+        xaxis={"visible": False},
+        yaxis={"visible": False},
+        width=700,
+        height=600,
+        margin=dict(l=100, r=100, t=50, b=50)
+    )
+    for player in PLAYERS:
+        fig.add_annotation(
+            x=player,
+            y=1,
+            xanchor="center",
+            yref="paper",
+            yanchor="bottom",
+            text=f"{player}",
+            showarrow=False,
+            font=dict(size=14)
+        )
+
+        fig.add_annotation(
+            x=0,
+            y=player,
+            xanchor="right",
+            xref="paper",
+            yanchor="middle",
+            text=f"{player}",
+            showarrow=False,
+            font=dict(size=14)
+        )
+    fig.update_coloraxes(showscale=False)
+    fig.update(layout_coloraxis_showscale=False)
+    fig.update_xaxes(side="top")
+
+    fig.show()
+    fig.write_html("html_graphs/head_to_head.html")
+
+
+def number_of_wins_df(data):
     data = data[PLAYERS]
     data = data.iloc[1:]
     data = data.fillna(-np.inf)
@@ -120,33 +250,10 @@ def number_of_places():
     data = data.replace(-np.inf, np.nan)
     # count the number of places for each player
     data = data.apply(pd.value_counts)
-    # divide each column by its sum:
-    for player in PLAYERS:
-        data[player] = data[player] / data[player].sum()
-
-    players_with_wins = list(zip(list(data.iloc[0]), list(data.columns)))
-    players_with_wins.sort(reverse=True)
-    sorted_players = [p[1] for p in players_with_wins]
-    data = data[sorted_players]
-
-    colors = ["gold", "silver", "peru", "#edebe1"]
-
-    fig = go.Figure(go.Bar(x=sorted_players, y=data.iloc[0],
-                           name=f'1. mesto', marker_color=colors[0]))
-    for place in range(1, 4):
-        fig.add_trace(go.Bar(x=sorted_players, y=data.iloc[place], name=f'{place+1}. mesto',
-                             marker_color=colors[place]))
-
-    fig.update_layout(
-        barmode='stack',
-        plot_bgcolor="white",
-        yaxis={'visible': False},
-        title='Delež uvrstitev posameznika',
-    )
-    fig.show()
-    fig.write_html("number_of_wins.html")
+    return data
 
 
 if __name__ == '__main__':
     all_time_leaderboard()
     number_of_places()
+    head_to_head()
