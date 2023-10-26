@@ -8,12 +8,12 @@ from heapq import nlargest
 
 PLAYERS = ["Peter", "Jernej", "Nace", "Gašper", "Blaž", "Ostali"]
 cmap = matplotlib.colormaps['Set2']
-COLORS = [f"rgb{(cmap(i)[0], cmap(i)[1], cmap(i)[2])}" for i in range(6)]
+COLORS = {PLAYERS[i]: f"rgb{(cmap(i)[0], cmap(i)[1], cmap(i)[2])}" for i in range(6)}
 print(COLORS)
 
 
 def all_time_leaderboard():
-    data = pd.read_csv('data.csv')
+    data = pd.read_csv('data/game_by_game_data.csv')
     # for each player, compute the cumulative sum of their played games as the cumsum of the column
     # "st. iger" for all the rows where the player is not NaN
     for player in PLAYERS:
@@ -32,9 +32,9 @@ def all_time_leaderboard():
         x = data[f"{player}_games"]
         y = data[player]
         fig.add_trace(go.Scatter(x=x, y=y, mode='lines', name=player,
-                                 line=dict(color=COLORS[PLAYERS.index(player)])))
+                                 line=dict(color=COLORS[player])))
 
-    # put the yaxis title on the right side
+    # put the yaxis title on the right sides
     fig.update_layout(
         title='Večna lestvica',
         xaxis_title='Število iger',
@@ -63,7 +63,7 @@ def all_time_leaderboard():
             xanchor="left",
             font=dict(
                 size=12,
-                color=COLORS[PLAYERS.index(player)]
+                color=COLORS[player]
             )
         )
 
@@ -81,7 +81,7 @@ def all_time_leaderboard():
             yanchor="top",
             font=dict(
                 size=18,
-                color=COLORS[PLAYERS.index(player)]
+                color=COLORS[player]
             )
         )
 
@@ -109,8 +109,9 @@ def arrange_positions(end_scores, k=0.04):
 
 
 def number_of_places():
-    data = pd.read_csv('data.csv')
-    data = number_of_wins_df(data)
+    data = pd.read_csv('data/wins_by_game.csv')
+    data = data[PLAYERS]
+    data = data.apply(pd.value_counts)
     counts = data.sum(axis=0)
     # make counts a dict with players as keys
     counts = dict(counts)
@@ -158,7 +159,7 @@ def number_of_places():
 
 
 def head_to_head():
-    data = pd.read_csv('data.csv')
+    data = pd.read_csv('data/game_by_game_data.csv')
     # for each player, count the number of wins against each other player
     data = data[PLAYERS]
     data = data.iloc[1:]
@@ -236,24 +237,71 @@ def head_to_head():
     fig.write_html("html_graphs/head_to_head.html")
 
 
-def number_of_wins_df(data):
+def stevilo_zmag_skozi_cas():
+    data = pd.read_csv('data/wins_by_game.csv')
     data = data[PLAYERS]
-    data = data.iloc[1:]
-    data = data.fillna(-np.inf)
+    data[data > 1] = 0
+    print(data)
+    plot_data = data.copy()
+    for player in PLAYERS:
+        plot_data[f"{player}_y"] = data[player].cumsum()
 
-    def f(row):
-        x = nlargest(4, enumerate(row.to_list()), key=lambda x: x[1])
-        for i in range(4):
-            row[x[i][0]] = i + 1
+    data[data == 0] = 1
+    for player in PLAYERS:
+        plot_data[f"{player}_x"] = data[player].cumsum()
 
-    data.apply(f, axis=1)
-    data = data.replace(-np.inf, np.nan)
-    # count the number of places for each player
-    data = data.apply(pd.value_counts)
-    return data
+    plot_data = plot_data[[f"{player}_x" for player in PLAYERS] +
+                          [f"{player}_y" for player in PLAYERS]]
+
+    fig = go.Figure()
+    for player in PLAYERS:
+        x = np.array(plot_data[f"{player}_x"])
+        y = np.array(plot_data[f"{player}_y"])
+        # remove nan values
+        x = x[~np.isnan(x)]
+        y = y[~np.isnan(y)]
+        # add 0 at the beginning
+        x = np.insert(x, 0, 0)
+        y = np.insert(y, 0, 0)
+        fig.add_trace(go.Scatter(x=x, y=y, mode='lines', name=player))
+        fig.add_trace(go.Scatter(x=[x[-1]], y=[y[-1]], mode='markers',
+                                 name=player, marker=dict(size=10)))
+
+    fig.update_layout(
+        title='Število zmag skozi čas',
+        plot_bgcolor="white",
+        xaxis_title="Število iger",
+        yaxis_title="Število zmag",
+        legend_title="Igralci",
+        width=1000,
+        height=600,
+        margin=dict(l=100, r=100, t=50, b=50)
+    )
+
+
+    fig.show()
+
+def create_leaderboard():
+    data = pd.read_csv('data/game_by_game_data.csv')
+    points_per_player = data[PLAYERS].sum()
+    # put all the non nan elements to 1
+    igre = data["st_iger"]
+    data = data[PLAYERS]
+    data[~np.isnan(data)] = 1
+    # row by row multiply the number of games with the number of wins
+    st_iger = data.multiply(igre, axis=0).sum()
+    table_string = "<table>\n<thead><tr><th>Igralec</th><th>Igre</th><th>Točke</th></tr></thead>\n"
+    for player in PLAYERS:
+        table_string += f"<tr><td>{player}</td><td>{int(st_iger[player])}</td>" \
+                        f"<td>{int(points_per_player[player])}</td></tr>\n"
+    table_string += "</table>"
+    with open("html_graphs/leaderboard.txt", "w") as f:
+        f.write(table_string)
 
 
 if __name__ == '__main__':
     all_time_leaderboard()
     number_of_places()
     head_to_head()
+    stevilo_zmag_skozi_cas()
+    create_leaderboard()

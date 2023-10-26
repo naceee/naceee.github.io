@@ -17,8 +17,11 @@ header h1 h2 h3{
 }
 
 body{
-  margin:40px auto;
-  max-width:800px;
+  margin-top: 20px;
+  margin-right: 400px;
+  margin-bottom: 20px;
+  margin-left: auto;
+  max-width:720px;
   line-height:1.6;
   font-size:18px;
   color:#444;
@@ -30,4 +33,32 @@ body{
 iframe{
   width: 100%;
   border: none;
+}
+.table-container {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 300px;
+    height: 100%;
+    background-color: #f0f0f0;
+    padding: 20px;
+    box-sizing: border-box;
+    overflow-y: scroll;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9em;
+    font-family: sans-serif;
+}
+table thead tr {
+    background-color: #6c6c6c;
+    color: #ffffff;
+    text-align: left;
+}
+
+th, td {
+    padding: 5px;
+    border: 1px solid #ccc;
 }
