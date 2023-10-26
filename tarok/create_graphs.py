@@ -1,9 +1,7 @@
 import pandas as pd
 import plotly.graph_objects as go
-import plotly.express as px
 import numpy as np
 import matplotlib
-from heapq import nlargest
 
 
 PLAYERS = ["Peter", "Jernej", "Nace", "Gašper", "Blaž", "Ostali"]
@@ -86,7 +84,7 @@ def all_time_leaderboard():
         )
 
     fig.show()
-    fig.write_html("html_graphs/all_time_leaderboard.html")
+    fig.write_html("graphs/all_time_leaderboard.html")
 
 
 def arrange_positions(end_scores, k=0.04):
@@ -155,7 +153,7 @@ def number_of_places():
         title='Delež uvrstitev posameznika',
     )
     fig.show()
-    fig.write_html("html_graphs/number_of_wins.html")
+    fig.write_html("graphs/number_of_wins.html")
 
 
 def head_to_head():
@@ -234,7 +232,7 @@ def head_to_head():
     fig.update_xaxes(side="top")
 
     fig.show()
-    fig.write_html("html_graphs/head_to_head.html")
+    fig.write_html("graphs/head_to_head.html")
 
 
 def stevilo_zmag_skozi_cas():
@@ -278,8 +276,8 @@ def stevilo_zmag_skozi_cas():
         margin=dict(l=100, r=100, t=50, b=50)
     )
 
-
     fig.show()
+
 
 def create_leaderboard():
     data = pd.read_csv('data/game_by_game_data.csv')
@@ -290,18 +288,23 @@ def create_leaderboard():
     data[~np.isnan(data)] = 1
     # row by row multiply the number of games with the number of wins
     st_iger = data.multiply(igre, axis=0).sum()
-    table_string = "<table>\n<thead><tr><th>Igralec</th><th>Igre</th><th>Točke</th></tr></thead>\n"
+    table_string = '<div class="table-container">\n<table>\n<thead><tr><th>Igralec</th>' \
+                   '<th>Igre</th><th>Točke</th></tr></thead>\n'
     for player in PLAYERS:
         table_string += f"<tr><td>{player}</td><td>{int(st_iger[player])}</td>" \
                         f"<td>{int(points_per_player[player])}</td></tr>\n"
-    table_string += "</table>"
-    with open("html_graphs/leaderboard.txt", "w") as f:
+    table_string += "</table>\n</div>\n"
+    with open("texts/leaderboard.txt", "w") as f:
         f.write(table_string)
 
 
-if __name__ == '__main__':
+def update_all():
     all_time_leaderboard()
     number_of_places()
     head_to_head()
     stevilo_zmag_skozi_cas()
     create_leaderboard()
+
+
+if __name__ == '__main__':
+    update_all()

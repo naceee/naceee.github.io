@@ -25,7 +25,7 @@ def create_df_from_csv():
     lines_df = pd.DataFrame(lines[1:], columns=lines[0])
     lines_df = lines_df.apply(pd.to_numeric, errors='ignore')
     # save the dataframe
-    lines_df.to_csv('game_by_game_data.csv', index=False)
+    lines_df.to_csv('data/game_by_game_data.csv', index=False)
 
 
 def create_df_with_wins_by_game():

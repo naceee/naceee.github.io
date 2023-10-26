@@ -1,3 +1,4 @@
+<div class="table-container">
 <table>
 <thead><tr><th>Igralec</th><th>Igre</th><th>Točke</th></tr></thead>
 <tr><td>Peter</td><td>1234</td><td>25643</td></tr>
@@ -7,3 +8,4 @@
 <tr><td>Blaž</td><td>1056</td><td>13091</td></tr>
 <tr><td>Ostali</td><td>536</td><td>4655</td></tr>
 </table>
+</div>
