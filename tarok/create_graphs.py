@@ -261,9 +261,9 @@ def stevilo_zmag_skozi_cas():
         # add 0 at the beginning
         x = np.insert(x, 0, 0)
         y = np.insert(y, 0, 0)
-        fig.add_trace(go.Scatter(x=x, y=y, mode='lines', name=player))
-        fig.add_trace(go.Scatter(x=[x[-1]], y=[y[-1]], mode='markers',
-                                 name=player, marker=dict(size=10)))
+        fig.add_trace(go.Scatter(x=x, y=y, mode='lines', name=player, line=dict(color=COLORS[player])))
+        fig.add_trace(go.Scatter(x=x, y=y, mode='markers',
+                                 name=player, marker=dict(size=6, color=COLORS[player])))
 
     fig.update_layout(
         title='Število zmag skozi čas',
@@ -271,8 +271,8 @@ def stevilo_zmag_skozi_cas():
         xaxis_title="Število iger",
         yaxis_title="Število zmag",
         legend_title="Igralci",
-        width=1000,
-        height=600,
+        width=800,
+        height=500,
         margin=dict(l=100, r=100, t=50, b=50)
     )
 
