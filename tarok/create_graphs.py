@@ -65,6 +65,7 @@ def all_time_leaderboard():
             )
         )
 
+        """
         ranking = end_scores.index.get_loc(player) + 1
         print(player, ranking, 1 - (ranking - 1) / 10)
         fig.add_annotation(
@@ -82,6 +83,7 @@ def all_time_leaderboard():
                 color=COLORS[player]
             )
         )
+        """
 
     fig.show()
     fig.write_html("graphs/all_time_leaderboard.html")
@@ -265,15 +267,29 @@ def stevilo_zmag_skozi_cas():
         fig.add_trace(go.Scatter(x=x, y=y, mode='markers',
                                  name=player, marker=dict(size=6, color=COLORS[player])))
 
+        fig.add_annotation(
+            x=x[-1],
+            y=y[-1],
+            text=player,
+            showarrow=False,
+            yshift=10,
+            xanchor="left",
+            font=dict(
+                size=12,
+                color=COLORS[player]
+            )
+        )
+
     fig.update_layout(
         title='Število zmag skozi čas',
         plot_bgcolor="white",
         xaxis_title="Število iger",
         yaxis_title="Število zmag",
         legend_title="Igralci",
+        showlegend=False,
         width=800,
         height=500,
-        margin=dict(l=100, r=100, t=50, b=50)
+        margin=dict(l=50, r=20, t=50, b=50)
     )
 
     fig.show()
