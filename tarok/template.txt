@@ -16,18 +16,19 @@
 
 TEXT: leaderboard
 
-TEXT: text1
-
 GRAPH: all_time_leaderboard
 
-TEXT: text2
+TEXT: text1
 
 GRAPH: number_of_wins
 
-TEXT: text3
+TEXT: text2
 
 GRAPH: head_to_head
 
+TEXT: text3
+
+GRAPH: number_of_wins_over_time
 
     </main>
     <footer>

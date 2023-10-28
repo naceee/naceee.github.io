@@ -277,6 +277,7 @@ def stevilo_zmag_skozi_cas():
     )
 
     fig.show()
+    fig.write_html("graphs/number_of_wins_over_time.html")
 
 
 def create_leaderboard():
