@@ -18,10 +18,10 @@ header h1 h2 h3{
 
 body{
   margin-top: 20px;
-  margin-right: 400px;
+  margin-right: auto;
   margin-bottom: 20px;
-  margin-left: auto;
-  max-width:720px;
+  margin-left: 80px;
+  max-width:820px;
   line-height:1.6;
   font-size:18px;
   color:#444;

@@ -39,7 +39,7 @@ def all_time_leaderboard():
         yaxis_title='Število točk',
         plot_bgcolor="white",
         showlegend=False,
-        margin=dict(r=100, t=50, b=50, l=50),
+        margin=dict(r=50, t=50, b=50, l=20),
         yaxis={'side': 'right'}
     )
 
