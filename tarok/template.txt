@@ -9,7 +9,7 @@
 <body>
     <header>
         <h1>Tukaj bojo enkrat grafi za tarok.</h1>
-        <h3>Obljubim, da bojo lepši, samo ura je 2 in moram it spat.</h3>
+        <button class="my-button" onclick="window.location.href='igraj.html'">IGRAJ TAROK</button>
     </header>
 
     <main>
