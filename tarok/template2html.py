@@ -1,4 +1,4 @@
-def main():
+def template_to_html():
     # read the txt file line by line
     with open('template.txt', 'r') as f:
         lines = f.readlines()
@@ -32,4 +32,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    template_to_html()

@@ -48,7 +48,11 @@ def create_df_with_wins_by_game():
     data.to_csv('data/wins_by_game.csv', index=False)
 
 
-if __name__ == '__main__':
+def save_all():
     download_as_csv()
     create_df_from_csv()
     create_df_with_wins_by_game()
+
+
+if __name__ == '__main__':
+    save_all()
