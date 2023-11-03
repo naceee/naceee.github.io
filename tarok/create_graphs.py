@@ -305,8 +305,8 @@ def create_leaderboard():
     data[~np.isnan(data)] = 1
     # row by row multiply the number of games with the number of wins
     st_iger = data.multiply(igre, axis=0).sum()
-    table_string = '<div class="table-container">\n<table>\n<thead><tr><th>Igralec</th>' \
-                   '<th>Igre</th><th>Točke</th></tr></thead>\n'
+    table_string = '<div class="table-container">\n<table>\n<thead><tr><th colspan="2">' \
+                   'Igralec</th><th>Igre</th><th>Točke</th></tr></thead>\n'
     for player in PLAYERS:
         table_string += f"<tr><td>{player}</td><td>{int(st_iger[player])}</td>" \
                         f"<td>{int(points_per_player[player])}</td></tr>\n"
@@ -314,6 +314,18 @@ def create_leaderboard():
     with open("texts/leaderboard.txt", "w") as f:
         f.write(table_string)
 
+
+def normalizirana_lestvica():
+    data = pd.read_csv('data/game_by_game_data.csv')
+    data["min"] = data[PLAYERS].min(axis=1)
+    data["max"] = data[PLAYERS].max(axis=1) - data["min"]
+    data[PLAYERS] = data[PLAYERS] - data["min"].values.reshape(-1, 1)
+    data[PLAYERS] = data[PLAYERS] / data["max"].values.reshape(-1, 1)
+    data[PLAYERS] = data[PLAYERS] * data["st_iger"].values.reshape(-1, 1)
+
+    print(data)
+    points_per_player = data[PLAYERS].sum()
+    print(points_per_player)
 
 def update_all():
     all_time_leaderboard()
@@ -324,4 +336,4 @@ def update_all():
 
 
 if __name__ == '__main__':
-    update_all()
+    normalizirana_lestvica()
