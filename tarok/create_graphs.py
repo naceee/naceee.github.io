@@ -3,10 +3,10 @@ import plotly.graph_objects as go
 import numpy as np
 import matplotlib
 
-
-PLAYERS = ["Peter", "Jernej", "Nace", "Gašper", "Blaž", "Ostali"]
+game_data = pd.read_csv('data/game_by_game_data.csv')
+PLAYERS = list(game_data.columns[1:])
 cmap = matplotlib.colormaps['Set2']
-COLORS = {PLAYERS[i]: f"rgb{(cmap(i)[0], cmap(i)[1], cmap(i)[2])}" for i in range(6)}
+COLORS = {PLAYERS[i]: f"rgb{(cmap(i)[0], cmap(i)[1], cmap(i)[2])}" for i in range(len(PLAYERS))}
 print(COLORS)
 
 
@@ -168,6 +168,7 @@ def head_to_head():
     for p1 in PLAYERS:
         for p2 in PLAYERS:
             data[f"{p1}_{p2}"] = data[p1] > data[p2]
+            print(PLAYERS, p1, p2)
             matrix[PLAYERS.index(p1), PLAYERS.index(p2)] = data[f"{p1}_{p2}"].sum()
 
     for i in range(len(PLAYERS)):
@@ -327,6 +328,7 @@ def normalizirana_lestvica():
     points_per_player = data[PLAYERS].sum()
     print(points_per_player)
 
+
 def update_all():
     all_time_leaderboard()
     number_of_places()
@@ -336,4 +338,5 @@ def update_all():
 
 
 if __name__ == '__main__':
-    normalizirana_lestvica()
+    # normalizirana_lestvica()
+    update_all()

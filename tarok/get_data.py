@@ -3,6 +3,8 @@ import pandas as pd
 import numpy as np
 from heapq import nlargest
 
+MERGE_PLAYERS = ["Ostali", "Mica", "Žaži", "Klančar"]
+
 
 def download_as_csv():
     response = requests.get("https://docs.google.com/spreadsheets/d/"
@@ -19,11 +21,15 @@ def create_df_from_csv():
         lines = f.readlines()
     # remove the first line
     lines = lines[2:]
-    lines = [l.split(",")[2:9] for l in lines if l[1] != ","]
-    lines[1] = ["", "0", "0", "0", "0", "0", "0"]
+    lines = [l.split(",")[2:12] for l in lines if l[1] != ","]
+    lines[1] = ["", "0", "0", "0", "0", "0", "0", "0", "0", "0"]
 
     lines_df = pd.DataFrame(lines[1:], columns=lines[0])
     lines_df = lines_df.apply(pd.to_numeric, errors='ignore')
+    # from the columns in MERGE_PLAYERS create a new column with the max value of the columns
+    lines_df["Ostali"] = lines_df[MERGE_PLAYERS].max(axis=1)
+    # remove all other columns in MERGE_PLAYERS
+    lines_df = lines_df.drop(columns=MERGE_PLAYERS[1:])
     # save the dataframe
     lines_df.to_csv('data/game_by_game_data.csv', index=False)
 
