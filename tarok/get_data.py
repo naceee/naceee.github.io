@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 from heapq import nlargest
 
-MERGE_PLAYERS = ["Ostali", "Mica", "Žaži", "Klančar"]
+MERGE_PLAYERS = ["Ostali", "Mica", "Žaži"]
 
 
 def download_as_csv():
