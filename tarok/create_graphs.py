@@ -143,7 +143,7 @@ def number_of_places():
             xanchor="center",
             yref="paper",
             yanchor="top",
-            text=f"{player}<br>({counts[player]} iger)",
+            text=f"{player}<br>({int(counts[player])} iger)",
             showarrow=False,
             font=dict(size=14)
         )
