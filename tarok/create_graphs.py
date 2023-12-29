@@ -306,7 +306,7 @@ def create_leaderboard():
     data[~np.isnan(data)] = 1
     # row by row multiply the number of games with the number of wins
     st_iger = data.multiply(igre, axis=0).sum()
-    table_string = '<div class="table-container">\n<table>\n<thead><tr><th colspan="2">' \
+    table_string = '<div class="table-container">\n<table>\n<thead><tr><th>' \
                    'Igralec</th><th>Igre</th><th>Točke</th></tr></thead>\n'
     for player in PLAYERS:
         table_string += f"<tr><td>{player}</td><td>{int(st_iger[player])}</td>" \
