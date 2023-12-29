@@ -308,7 +308,13 @@ def create_leaderboard():
     st_iger = data.multiply(igre, axis=0).sum()
     table_string = '<div class="table-container">\n<table>\n<thead><tr><th>' \
                    'Igralec</th><th>Igre</th><th>Točke</th></tr></thead>\n'
-    for player in PLAYERS:
+
+    # sort players by points
+    sort_idx = np.argsort(points_per_player)[::-1]
+    PLAYERS_sorted = [PLAYERS[i] for i in sort_idx]
+    points_per_player = points_per_player[sort_idx]
+
+    for player in PLAYERS_sorted:
         table_string += f"<tr><td>{player}</td><td>{int(st_iger[player])}</td>" \
                         f"<td>{int(points_per_player[player])}</td></tr>\n"
     table_string += "</table>\n</div>\n"
