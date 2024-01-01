@@ -344,5 +344,5 @@ def update_all():
 
 
 if __name__ == '__main__':
-    head_to_head()
-    # update_all()
+    # head_to_head()
+    update_all()
