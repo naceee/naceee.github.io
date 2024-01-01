@@ -195,7 +195,7 @@ def head_to_head():
     # Load xarray from dataset included in the xarray tutorial
     fig = go.Figure(data=go.Heatmap(z=matrix, x=PLAYERS, y=PLAYERS[::-1],
                     text=text, texttemplate="%{text}", textfont={"size": 16},
-                    colorscale='RdBu_r', reversescale=True))
+                    colorscale=[(0, "red"), (0.5, "white"), (1, "green")]))
 
     fig.update_layout(
         title='Kdo koga ponavadi nabije',
@@ -344,5 +344,5 @@ def update_all():
 
 
 if __name__ == '__main__':
-    # normalizirana_lestvica()
-    update_all()
+    head_to_head()
+    # update_all()
