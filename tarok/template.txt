@@ -14,6 +14,8 @@
 
     <main>
 
+GRAPH: last_500_leaderboard
+
 TEXT: leaderboard
 
 GRAPH: all_time_leaderboard

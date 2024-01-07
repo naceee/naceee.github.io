@@ -57,7 +57,6 @@ def all_time_leaderboard():
             y=y_positions[player],
             text=player,
             showarrow=False,
-            yshift=10,
             xanchor="left",
             font=dict(
                 size=12,
@@ -65,28 +64,55 @@ def all_time_leaderboard():
             )
         )
 
-        """
-        ranking = end_scores.index.get_loc(player) + 1
-        print(player, ranking, 1 - (ranking - 1) / 10)
+    fig.show()
+    fig.write_html("graphs/all_time_leaderboard.html")
+
+
+def last_500_leaderboard():
+    data = pd.read_csv('data/last_500_games.csv')
+
+    # plot the data using plotly
+    fig = go.Figure()
+    for player in PLAYERS:
+        x = data["st_iger"]
+        y = data[player]
+        fig.add_trace(go.Scatter(x=x, y=y, mode='lines', name=player,
+                                 line=dict(color=COLORS[player])))
+
+    # put the yaxis title on the right sides
+    fig.update_layout(
+        title='Lestvica forme',
+        xaxis_title='Število iger',
+        yaxis_title='Število točk',
+        plot_bgcolor="white",
+        showlegend=False,
+        margin=dict(r=50, t=50, b=50, l=20),
+        yaxis={'side': 'right'}
+    )
+
+    # compute the end score for each player
+    end_scores = data.iloc[-1]
+    # sort the players by their end score
+    end_scores = end_scores.sort_values(ascending=False)
+    y_positions = arrange_positions(end_scores)
+
+    # add the end score to the plot
+    for player in PLAYERS:
         fig.add_annotation(
-            x=0,
-            y=1 - (ranking - 1) / 15,
-            text=f"{ranking}. {player}: {int(data[player].iloc[-1])} "
-                 f"({int(data[f'{player}_games'].iloc[-1])} iger)",
+            x=500,
+            y=y_positions[player],
+            text=player,
             showarrow=False,
-            xref="paper",
-            yref="paper",
             xanchor="left",
-            yanchor="top",
+            yanchor="middle",
             font=dict(
-                size=18,
+                size=12,
                 color=COLORS[player]
             )
         )
-        """
 
     fig.show()
-    fig.write_html("graphs/all_time_leaderboard.html")
+    fig.write_html("graphs/last_500_leaderboard.html")
 
 
 def arrange_positions(end_scores, k=0.04):
@@ -358,8 +384,8 @@ def update_all():
     head_to_head()
     stevilo_zmag_skozi_cas()
     create_leaderboard()
+    last_500_leaderboard()
 
 
 if __name__ == '__main__':
-    head_to_head()
-    # update_all()
+    update_all()
