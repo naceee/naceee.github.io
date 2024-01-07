@@ -16,11 +16,11 @@
 
 TEXT: leaderboard
 
-GRAPH: last_500_leaderboard
+GRAPH: all_time_leaderboard
 
 TEXT: text0
 
-GRAPH: all_time_leaderboard
+GRAPH: last_500_leaderboard
 
 TEXT: text1
 
