@@ -14,9 +14,11 @@
 
     <main>
 
+TEXT: leaderboard
+
 GRAPH: last_500_leaderboard
 
-TEXT: leaderboard
+TEXT: text0
 
 GRAPH: all_time_leaderboard
 
