@@ -177,6 +177,15 @@ def head_to_head():
             matrix[i, j] = matrix[i, j] / (matrix[i, j] + matrix[j, i])
             matrix[j, i] = 1 - matrix[i, j]
 
+    order_counts = []
+    for i in range(len(PLAYERS)):
+        count1 = (matrix[i, :] > 0.5).sum() + 0.5 * (matrix[:, i] == 0.5).sum()
+        # count the total values that are not nan
+        count2 = matrix[i, ~np.isnan(matrix[i, :])].sum()
+        order_counts.append(count1 + count2)
+
+    player_idx = np.array(np.argsort(order_counts), dtype=int)[::-1]
+
     matrix = matrix * 100
 
     text = matrix.copy()
@@ -188,12 +197,20 @@ def head_to_head():
             if text[i, j] != "":
                 text[i, j] += "%"
 
+    matrix[:, :] = matrix[player_idx, :]
+    text[:, :] = text[player_idx, :]
+
+    matrix[:, :] = matrix[:, player_idx]
+    text[:, :] = text[:, player_idx]
+
     # flip the matrix upside down
     matrix = np.flip(matrix, axis=0)
     text = np.flip(text, axis=0)
 
-    # Load xarray from dataset included in the xarray tutorial
-    fig = go.Figure(data=go.Heatmap(z=matrix, x=PLAYERS, y=PLAYERS[::-1],
+    PLAYER_NAMES = np.array(PLAYERS.copy())[player_idx]
+    print(PLAYER_NAMES)
+
+    fig = go.Figure(data=go.Heatmap(z=matrix, x=PLAYER_NAMES, y=PLAYER_NAMES[::-1],
                     text=text, texttemplate="%{text}", textfont={"size": 16},
                     colorscale=[(0, "red"), (0.5, "white"), (1, "green")]))
 
@@ -208,7 +225,7 @@ def head_to_head():
         height=600,
         margin=dict(l=100, r=100, t=50, b=50)
     )
-    for player in PLAYERS:
+    for player in PLAYER_NAMES:
         fig.add_annotation(
             x=player,
             y=1,
@@ -344,5 +361,5 @@ def update_all():
 
 
 if __name__ == '__main__':
-    # head_to_head()
-    update_all()
+    head_to_head()
+    # update_all()
