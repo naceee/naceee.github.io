@@ -2,8 +2,11 @@ import pandas as pd
 import plotly.graph_objects as go
 import numpy as np
 import matplotlib
+import os
 
-game_data = pd.read_csv('data/game_by_game_data.csv')
+DIR = os.path.dirname(os.path.abspath(__file__))
+
+game_data = pd.read_csv(f'{DIR}/data/game_by_game_data.csv')
 PLAYERS = list(game_data.columns[1:])
 cmap = matplotlib.colormaps['Set2']
 COLORS = {PLAYERS[i]: f"rgb{(cmap(i)[0], cmap(i)[1], cmap(i)[2])}" for i in range(len(PLAYERS))}
@@ -11,7 +14,7 @@ print(COLORS)
 
 
 def all_time_leaderboard():
-    data = pd.read_csv('data/game_by_game_data.csv')
+    data = pd.read_csv(f'{DIR}/data/game_by_game_data.csv')
     # for each player, compute the cumulative sum of their played games as the cumsum of the column
     # "st. iger" for all the rows where the player is not NaN
     for player in PLAYERS:
@@ -65,11 +68,11 @@ def all_time_leaderboard():
         )
 
     fig.show()
-    fig.write_html("graphs/all_time_leaderboard.html")
+    fig.write_html(f'{DIR}/graphs/all_time_leaderboard.html')
 
 
 def last_500_leaderboard():
-    data = pd.read_csv('data/last_500_games.csv')
+    data = pd.read_csv(f'{DIR}/data/last_500_games.csv')
 
     # plot the data using plotly
     fig = go.Figure()
@@ -112,7 +115,7 @@ def last_500_leaderboard():
         )
 
     fig.show()
-    fig.write_html("graphs/last_500_leaderboard.html")
+    fig.write_html(f'{DIR}/graphs/last_500_leaderboard.html')
 
 
 def arrange_positions(end_scores, k=0.04):
@@ -135,7 +138,7 @@ def arrange_positions(end_scores, k=0.04):
 
 
 def number_of_places():
-    data = pd.read_csv('data/wins_by_game.csv')
+    data = pd.read_csv(f'{DIR}/data/wins_by_game.csv')
     data = data[PLAYERS]
     data = data.apply(pd.value_counts)
     counts = data.sum(axis=0)
@@ -181,11 +184,11 @@ def number_of_places():
         title='Delež uvrstitev posameznika',
     )
     fig.show()
-    fig.write_html("graphs/number_of_wins.html")
+    fig.write_html(f'{DIR}/graphs/number_of_wins.html')
 
 
 def head_to_head():
-    data = pd.read_csv('data/game_by_game_data.csv')
+    data = pd.read_csv(f'{DIR}/data/game_by_game_data.csv')
     # for each player, count the number of wins against each other player
     data = data[PLAYERS]
     data = data.iloc[1:]
@@ -278,11 +281,11 @@ def head_to_head():
     fig.update_xaxes(side="top")
 
     fig.show()
-    fig.write_html("graphs/head_to_head.html")
+    fig.write_html(f'{DIR}/graphs/head_to_head.html')
 
 
 def stevilo_zmag_skozi_cas():
-    data = pd.read_csv('data/wins_by_game.csv')
+    data = pd.read_csv(f'{DIR}/data/wins_by_game.csv')
     data = data[PLAYERS]
     data[data > 1] = 0
     print(data)
@@ -337,11 +340,11 @@ def stevilo_zmag_skozi_cas():
     )
 
     fig.show()
-    fig.write_html("graphs/number_of_wins_over_time.html")
+    fig.write_html(f'{DIR}/graphs/number_of_wins_over_time.html')
 
 
 def create_leaderboard():
-    data = pd.read_csv('data/game_by_game_data.csv')
+    data = pd.read_csv(f'{DIR}/data/game_by_game_data.csv')
     points_per_player = data[PLAYERS].sum()
     # put all the non nan elements to 1
     igre = data["st_iger"]
@@ -361,12 +364,12 @@ def create_leaderboard():
         table_string += f"<tr><td>{player}</td><td>{int(st_iger[player])}</td>" \
                         f"<td>{int(points_per_player[player])}</td></tr>\n"
     table_string += "</table>\n</div>\n"
-    with open("texts/leaderboard.txt", "w") as f:
+    with open(f'{DIR}/texts/leaderboard.txt', "w") as f:
         f.write(table_string)
 
 
 def normalizirana_lestvica():
-    data = pd.read_csv('data/game_by_game_data.csv')
+    data = pd.read_csv(f'{DIR}/data/game_by_game_data.csv')
     data["min"] = data[PLAYERS].min(axis=1)
     data["max"] = data[PLAYERS].max(axis=1) - data["min"]
     data[PLAYERS] = data[PLAYERS] - data["min"].values.reshape(-1, 1)

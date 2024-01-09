@@ -3,6 +3,9 @@ import requests
 import pandas as pd
 import numpy as np
 from heapq import nlargest
+import os
+
+DIR = os.path.dirname(os.path.abspath(__file__))
 
 MERGE_PLAYERS = ["Ostali", "Mica", "Žaži", "Klančar"]
 
@@ -12,13 +15,13 @@ def download_as_csv():
                             "1Cv9EgP-gcNYhTOR2O9DxDBdSoSLT0iBg5lDCvBdx51E/export?format=csv")
     assert response.status_code == 200, 'Wrong status code'
     # write to file
-    with open('data/raw_data.csv', 'wb') as f:
+    with open(f'{DIR}/data/raw_data.csv', 'wb') as f:
         f.write(response.content)
 
 
 def create_df_from_csv():
     # read the csv file line by line
-    with open('data/raw_data.csv', 'r') as f:
+    with open(f'{DIR}/data/raw_data.csv', 'r') as f:
         lines = f.readlines()
     # remove the first line
     lines = lines[2:]
@@ -32,11 +35,11 @@ def create_df_from_csv():
     # remove all other columns in MERGE_PLAYERS
     lines_df = lines_df.drop(columns=MERGE_PLAYERS[1:])
     # save the dataframe
-    lines_df.to_csv('data/game_by_game_data.csv', index=False)
+    lines_df.to_csv(f'{DIR}/data/game_by_game_data.csv', index=False)
 
 
 def create_df_with_wins_by_game():
-    data = pd.read_csv('data/game_by_game_data.csv')
+    data = pd.read_csv(f'{DIR}/data/game_by_game_data.csv')
     games = data["st_iger"]
     data = data.drop(columns=["st_iger"])
     data = data.iloc[1:]
@@ -52,11 +55,11 @@ def create_df_with_wins_by_game():
     data["st_iger"] = games
 
     # save the dataframe
-    data.to_csv('data/wins_by_game.csv', index=False)
+    data.to_csv(f'{DIR}/data/wins_by_game.csv', index=False)
 
 
 def create_df_with_games_by_one(n=500):
-    data = pd.read_csv('data/game_by_game_data.csv')
+    data = pd.read_csv(f'{DIR}/data/game_by_game_data.csv')
     PLAYERS = data.columns[1:]
 
     games = data["st_iger"]
@@ -90,7 +93,7 @@ def create_df_with_games_by_one(n=500):
     for p in PLAYERS:
         df[p] = df[p] - df.iloc[0][p]
     df = df[["st_iger"] + list(PLAYERS)]
-    df.to_csv(f'data/last_{n}_games.csv', index=False)
+    df.to_csv(f'{DIR}/data/last_{n}_games.csv', index=False)
 
 
 def save_all():

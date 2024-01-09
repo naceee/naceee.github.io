@@ -1,6 +1,11 @@
+import os
+
+DIR = os.path.dirname(os.path.abspath(__file__))
+
+
 def template_to_html():
     # read the txt file line by line
-    with open('template.txt', 'r') as f:
+    with open(f'{DIR}/template.txt', 'r') as f:
         lines = f.readlines()
 
     html = ""
@@ -16,7 +21,7 @@ def template_to_html():
 
         elif split_line[0] == "TEXT:":
             # read the full text file
-            with open(f"texts/{split_line[1]}.txt", 'r') as f:
+            with open(f'{DIR}/texts/{split_line[1]}.txt', 'r') as f:
                 text = f.read()
 
             html += '<div>\n'
@@ -27,7 +32,7 @@ def template_to_html():
             html += line + "\n"
 
     # write to file
-    with open('stats.html', 'w') as f:
+    with open(f'{DIR}/stats.html', 'w') as f:
         f.write(html)
 
 
