@@ -93,7 +93,7 @@ def create_df_with_games_by_one(n=200):
     for p in PLAYERS:
         df[p] = df[p] - df.iloc[0][p]
     df = df[["st_iger"] + list(PLAYERS)]
-    df.to_csv(f'{DIR}/data/last_{n}_games.csv', index=False)
+    df.to_csv(f'{DIR}/data/last_n_games.csv', index=False)
 
 
 def save_all():

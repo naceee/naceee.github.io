@@ -71,8 +71,8 @@ def all_time_leaderboard():
     fig.write_html(f'{DIR}/graphs/all_time_leaderboard.html')
 
 
-def last_500_leaderboard():
-    data = pd.read_csv(f'{DIR}/data/last_500_games.csv')
+def last_n_leaderboard():
+    data = pd.read_csv(f'{DIR}/data/last_n_games.csv')
 
     # plot the data using plotly
     fig = go.Figure()
@@ -115,7 +115,7 @@ def last_500_leaderboard():
         )
 
     fig.show()
-    fig.write_html(f'{DIR}/graphs/last_500_leaderboard.html')
+    fig.write_html(f'{DIR}/graphs/last_n_leaderboard.html')
 
 
 def arrange_positions(end_scores, k=0.04):
@@ -387,7 +387,7 @@ def update_all():
     head_to_head()
     stevilo_zmag_skozi_cas()
     create_leaderboard()
-    last_500_leaderboard()
+    last_n_leaderboard()
 
 
 if __name__ == '__main__':

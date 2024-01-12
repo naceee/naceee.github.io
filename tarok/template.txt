@@ -20,7 +20,7 @@ GRAPH: all_time_leaderboard
 
 TEXT: text0
 
-GRAPH: last_500_leaderboard
+GRAPH: last_n_leaderboard
 
 TEXT: text1
 
