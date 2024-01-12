@@ -102,7 +102,7 @@ def last_n_leaderboard():
     # add the end score to the plot
     for player in PLAYERS:
         fig.add_annotation(
-            x=500,
+            x=list(data["st_iger"])[-1],
             y=y_positions[player],
             text=player,
             showarrow=False,
