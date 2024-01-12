@@ -58,7 +58,7 @@ def create_df_with_wins_by_game():
     data.to_csv(f'{DIR}/data/wins_by_game.csv', index=False)
 
 
-def create_df_with_games_by_one(n=500):
+def create_df_with_games_by_one(n=200):
     data = pd.read_csv(f'{DIR}/data/game_by_game_data.csv')
     PLAYERS = data.columns[1:]
 
