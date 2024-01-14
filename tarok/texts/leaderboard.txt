@@ -2,10 +2,10 @@
 <table>
 <thead><tr><th>Igralec</th><th>Igre</th><th>Točke</th></tr></thead>
 <tr><td>Jernej</td><td>1752</td><td>32552</td></tr>
-<tr><td>Peter</td><td>1681</td><td>31589</td></tr>
-<tr><td>Nace</td><td>1474</td><td>24872</td></tr>
-<tr><td>Blaž</td><td>1267</td><td>20867</td></tr>
-<tr><td>Gašper</td><td>1544</td><td>19082</td></tr>
+<tr><td>Peter</td><td>1696</td><td>29492</td></tr>
+<tr><td>Nace</td><td>1489</td><td>24714</td></tr>
+<tr><td>Blaž</td><td>1282</td><td>21805</td></tr>
+<tr><td>Gašper</td><td>1559</td><td>19079</td></tr>
 <tr><td>Ostali</td><td>759</td><td>2298</td></tr>
 </table>
 </div>
