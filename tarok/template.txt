@@ -9,7 +9,7 @@
 <body>
     <header>
         <h1>Tukaj bojo enkrat grafi za tarok.</h1>
-        <button class="my-button" onclick="window.location.href='igraj.html'">IGRAJ TAROK</button>
+        <button class="my-button" onclick="window.location.href='https://docs.google.com/spreadsheets/d/1Cv9EgP-gcNYhTOR2O9DxDBdSoSLT0iBg5lDCvBdx51E/edit?usp=sharing'">VPIŠI TOČKE</button>
     </header>
 
     <main>
