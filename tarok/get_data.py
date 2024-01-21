@@ -19,7 +19,7 @@ def download_as_csv():
         f.write(response.content)
 
 
-def create_df_from_csv():
+def create_df_from_csv(all_players=False):
     # read the csv file line by line
     with open(f'{DIR}/data/raw_data.csv', 'r') as f:
         lines = f.readlines()
@@ -31,11 +31,14 @@ def create_df_from_csv():
     lines_df = pd.DataFrame(lines[1:], columns=lines[0])
     lines_df = lines_df.apply(pd.to_numeric, errors='ignore')
     # from the columns in MERGE_PLAYERS create a new column with the max value of the columns
-    lines_df["Ostali"] = lines_df[MERGE_PLAYERS].max(axis=1)
-    # remove all other columns in MERGE_PLAYERS
-    lines_df = lines_df.drop(columns=MERGE_PLAYERS[1:])
-    # save the dataframe
-    lines_df.to_csv(f'{DIR}/data/game_by_game_data.csv', index=False)
+    if all_players:
+        lines_df["Ostali"] = lines_df[MERGE_PLAYERS].max(axis=1)
+        # remove all other columns in MERGE_PLAYERS
+        lines_df = lines_df.drop(columns=MERGE_PLAYERS[1:])
+        # save the dataframe
+        lines_df.to_csv(f'{DIR}/data/game_by_game_data.csv', index=False)
+    else:
+        lines_df.to_csv(f'{DIR}/data/leaderboard_data.csv', index=False)
 
 
 def create_df_with_wins_by_game():
@@ -98,7 +101,8 @@ def create_df_with_games_by_one(n=200):
 
 def save_all():
     download_as_csv()
-    create_df_from_csv()
+    create_df_from_csv(all_players=True)
+    create_df_from_csv(all_players=False)
     create_df_with_wins_by_game()
     create_df_with_games_by_one()
 

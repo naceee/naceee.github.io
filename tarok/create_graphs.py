@@ -344,7 +344,8 @@ def stevilo_zmag_skozi_cas():
 
 
 def create_leaderboard():
-    data = pd.read_csv(f'{DIR}/data/game_by_game_data.csv')
+    data = pd.read_csv(f'{DIR}/data/leaderboard_data.csv')
+    PLAYERS = list(data.columns[1:])
     points_per_player = data[PLAYERS].sum()
     # put all the non nan elements to 1
     igre = data["st_iger"]
