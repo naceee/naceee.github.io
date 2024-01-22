@@ -1,11 +1,11 @@
 <div class="table-container">
 <table>
 <thead><tr><th>Igralec</th><th>Igre</th><th>Točke</th></tr></thead>
-<tr><td>Jernej</td><td>1850</td><td>33614</td></tr>
-<tr><td>Peter</td><td>1794</td><td>31127</td></tr>
-<tr><td>Nace</td><td>1545</td><td>25348</td></tr>
+<tr><td>Jernej</td><td>1870</td><td>33311</td></tr>
+<tr><td>Peter</td><td>1814</td><td>31043</td></tr>
+<tr><td>Nace</td><td>1565</td><td>25534</td></tr>
 <tr><td>Blaž</td><td>1340</td><td>20542</td></tr>
-<tr><td>Gašper</td><td>1617</td><td>20066</td></tr>
+<tr><td>Gašper</td><td>1637</td><td>20437</td></tr>
 <tr><td>Ostali</td><td>283</td><td>2826</td></tr>
 <tr><td>Klančar</td><td>139</td><td>1971</td></tr>
 <tr><td>Žaži</td><td>147</td><td>1832</td></tr>
