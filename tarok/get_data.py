@@ -7,7 +7,7 @@ import os
 
 DIR = os.path.dirname(os.path.abspath(__file__))
 
-MERGE_PLAYERS = ["Ostali", "Mica", "Žaži", "Klančar", "Ferjan"]
+MERGE_PLAYERS = ["Ostali", "Mica", "Žaži", "Klančar", "Ferjan", "Kocjančič"]
 
 
 def download_as_csv():
@@ -25,7 +25,7 @@ def create_df_from_csv(all_players=False):
         lines = f.readlines()
     # remove the first line
     lines = lines[2:]
-    lines = [l.split(",")[2:13] for l in lines if l[1] != ","]
+    lines = [l.split(",")[2:14] for l in lines if l[1] != ","]
     lines[1] = ["", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"]
 
     lines_df = pd.DataFrame(lines[1:], columns=lines[0])
