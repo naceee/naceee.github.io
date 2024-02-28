@@ -37,13 +37,11 @@ def all_time_leaderboard():
 
     # put the yaxis title on the right sides
     fig.update_layout(
-        title='Večna lestvica',
-        xaxis_title='Število iger',
-        yaxis_title='Število točk',
         plot_bgcolor="white",
+        yaxis={'visible': False},
         showlegend=False,
-        margin=dict(r=50, t=50, b=50, l=20),
-        yaxis={'side': 'right'}
+        margin=dict(r=20, t=20, b=20, l=20),
+        xaxis={'visible': False}
     )
 
     # compute the end score for each player
@@ -58,12 +56,13 @@ def all_time_leaderboard():
         fig.add_annotation(
             x=data[f"{player}_games"].iloc[-1],
             y=y_positions[player],
-            text=player,
+            text=f"{player} {int(y_positions[player])}",
             showarrow=False,
             xanchor="left",
             font=dict(
-                size=12,
-                color=COLORS[player]
+                size=14,
+                color=COLORS[player],
+                family="arial"
             )
         )
 
@@ -84,13 +83,11 @@ def last_n_leaderboard():
 
     # put the yaxis title on the right sides
     fig.update_layout(
-        title='Lestvica forme',
-        xaxis_title='Število iger',
-        yaxis_title='Število točk',
         plot_bgcolor="white",
         showlegend=False,
-        margin=dict(r=50, t=50, b=50, l=20),
-        yaxis={'side': 'right'}
+        margin=dict(r=20, t=20, b=20, l=20),
+        xaxis={'visible': False},
+        yaxis={'visible': False}
     )
 
     # compute the end score for each player
@@ -104,13 +101,14 @@ def last_n_leaderboard():
         fig.add_annotation(
             x=list(data["st_iger"])[-1],
             y=y_positions[player],
-            text=player,
+            text=player + " " + str(int(y_positions[player])),
             showarrow=False,
             xanchor="left",
             yanchor="middle",
             font=dict(
-                size=12,
-                color=COLORS[player]
+                size=14,
+                color=COLORS[player],
+                family="arial"
             )
         )
 
@@ -174,15 +172,16 @@ def number_of_places():
             yanchor="top",
             text=f"{player}<br>({int(counts[player])} iger)",
             showarrow=False,
-            font=dict(size=14)
         )
 
     fig.update_layout(
         barmode='stack',
         plot_bgcolor="white",
         yaxis={'visible': False},
-        title='Delež uvrstitev posameznika',
+        xaxis={'visible': False}
     )
+    fig.update_annotations(font=dict(family="arial", size=18))
+
     fig.show()
     fig.write_html(f'{DIR}/graphs/number_of_wins.html')
 
@@ -244,15 +243,16 @@ def head_to_head():
                     colorscale=[(0, "red"), (0.5, "white"), (1, "green")]))
 
     fig.update_layout(
-        title='Kdo koga ponavadi nabije',
         showlegend=False,
         plot_bgcolor="white",
         coloraxis_showscale=False,
         xaxis={"visible": False},
         yaxis={"visible": False},
-        width=700,
-        height=600,
-        margin=dict(l=100, r=100, t=50, b=50)
+        # margin=dict(l=200, r=200, t=50, b=50)
+    )
+    fig.update_yaxes(
+        scaleanchor="x",
+        scaleratio=1,
     )
     for player in PLAYER_NAMES:
         fig.add_annotation(
@@ -263,19 +263,18 @@ def head_to_head():
             yanchor="bottom",
             text=f"{player}",
             showarrow=False,
-            font=dict(size=14)
         )
 
         fig.add_annotation(
-            x=0,
+            x=-0.6,
             y=player,
             xanchor="right",
-            xref="paper",
             yanchor="middle",
             text=f"{player}",
             showarrow=False,
-            font=dict(size=14)
         )
+
+    fig.update_annotations(font=dict(family="arial", size=18, color="#444"))
     fig.update_coloraxes(showscale=False)
     fig.update(layout_coloraxis_showscale=False)
     fig.update_xaxes(side="top")
@@ -322,21 +321,18 @@ def stevilo_zmag_skozi_cas():
             yshift=10,
             xanchor="left",
             font=dict(
-                size=12,
-                color=COLORS[player]
+                size=14,
+                color=COLORS[player],
+                family="arial"
             )
         )
 
     fig.update_layout(
-        title='Število zmag skozi čas',
         plot_bgcolor="white",
-        xaxis_title="Število iger",
-        yaxis_title="Število zmag",
-        legend_title="Igralci",
+        yaxis={'visible': False},
         showlegend=False,
-        width=800,
-        height=500,
-        margin=dict(l=50, r=20, t=50, b=50)
+        margin=dict(r=20, t=20, b=20, l=20),
+        xaxis={'visible': False}
     )
 
     fig.show()
@@ -354,7 +350,7 @@ def create_leaderboard():
     # row by row multiply the number of games with the number of wins
     st_iger = data.multiply(igre, axis=0).sum()
     table_string = '<div class="table-container">\n<table>\n<thead><tr><th>' \
-                   'Igralec</th><th>Igre</th><th>Točke</th></tr></thead>\n'
+                   'Igralec</th><th>Igre</th><th>Točke</th><th>na igro</th></tr></thead>\n'
 
     # sort players by points
     sort_idx = np.argsort(points_per_player)[::-1]
@@ -362,9 +358,15 @@ def create_leaderboard():
     points_per_player = points_per_player[sort_idx]
 
     for player in PLAYERS_sorted:
-        table_string += f"<tr><td>{player}</td><td>{int(st_iger[player])}</td>" \
-                        f"<td>{int(points_per_player[player])}</td></tr>\n"
-    table_string += "</table>\n</div>\n"
+        table_string += f'<tr><td>{player}</td><td>{int(st_iger[player])}</td>' \
+                        f'<td>{int(points_per_player[player])}</td>' \
+                        f'<td>{round(int(points_per_player[player])/int(st_iger[player]), 1)}</td></tr>\n'
+    table_string += '</table>\n' \
+                    '<button class ="my-button" onclick="window.location.href="' \
+                    'https://docs.google.com/spreadsheets/d/1Cv9EgP-gcNYhTOR2O9' \
+                    'DxDBdSoSLT0iBg5lDCvBdx51E/edit?usp=sharing" > VPIŠI TOČKE </button> \n' \
+                    '</div>\n'
+
     with open(f'{DIR}/texts/leaderboard.txt', "w") as f:
         f.write(table_string)
 

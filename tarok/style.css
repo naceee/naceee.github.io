@@ -18,12 +18,13 @@ header h1 h2 h3{
 
 body{
   margin-top: 20px;
-  margin-right: auto;
+  margin-right: 28%;
   margin-bottom: 20px;
-  margin-left: 80px;
-  max-width:820px;
+  margin-left: 5%;
+  max-width:65%;
   line-height:1.6;
   font-size:18px;
+  font-family: Arial, sans-serif;
   color:#444;
   padding: 0 10px;
   background-color: white;
@@ -33,12 +34,13 @@ body{
 iframe{
   width: 100%;
   border: none;
+  margin-bottom: 3cm;
 }
 .table-container {
     position: fixed;
     top: 0;
     right: 0;
-    width: 300px;
+    width: 23%;
     height: 100%;
     background-color: #f0f0f0;
     padding: 20px;

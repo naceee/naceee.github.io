@@ -8,30 +8,26 @@
 </head>
 <body>
     <header>
-        <h1>Tukaj bojo enkrat grafi za tarok.</h1>
-        <button class="my-button" onclick="window.location.href='https://docs.google.com/spreadsheets/d/1Cv9EgP-gcNYhTOR2O9DxDBdSoSLT0iBg5lDCvBdx51E/edit?usp=sharing'">VPIŠI TOČKE</button>
+        <h1>TAROK</h1>
     </header>
 
     <main>
 
 TEXT: leaderboard
 
+<h2>MENI JE VSEENO ZA VEČNO LESTVICO</h2>
 GRAPH: all_time_leaderboard
 
-TEXT: text0
-
+<h2>KDO JE V FORMI?</h2>
 GRAPH: last_n_leaderboard
 
-TEXT: text1
-
+<h2>KAKO PETER VEDNO ZMAGA?</h2>
 GRAPH: number_of_wins
 
-TEXT: text2
-
+<h2>TVOJ NAJVEČJI SOVRAŽNINK</h2>
 GRAPH: head_to_head
 
-TEXT: text3
-
+<h2>VEČNA LESTVICA ZMAG</h2>
 GRAPH: number_of_wins_over_time
 
     </main>
