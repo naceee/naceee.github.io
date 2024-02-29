@@ -357,15 +357,17 @@ def create_leaderboard():
     PLAYERS_sorted = [PLAYERS[i] for i in sort_idx]
     points_per_player = points_per_player[sort_idx]
 
+    link = "window.location.href='https://docs.google.com/spreadsheets/d/1Cv9EgP-gcNYhTOR2O9DxDBdSoSLT0iBg5lDCvBdx51E/edit?usp=sharing'"
+
+
+
     for player in PLAYERS_sorted:
         table_string += f'<tr><td>{player}</td><td>{int(st_iger[player])}</td>' \
                         f'<td>{int(points_per_player[player])}</td>' \
                         f'<td>{round(int(points_per_player[player])/int(st_iger[player]), 1)}</td></tr>\n'
-    table_string += '</table>\n' \
-                    '<button class ="my-button" onclick="window.location.href="' \
-                    'https://docs.google.com/spreadsheets/d/1Cv9EgP-gcNYhTOR2O9' \
-                    'DxDBdSoSLT0iBg5lDCvBdx51E/edit?usp=sharing" > VPIŠI TOČKE </button> \n' \
-                    '</div>\n'
+    table_string += f'</table>\n' \
+                    f'<button class ="my-button" onclick="{link}"> VPIŠI TOČKE </button> \n' \
+                    f'</div>\n'
 
     with open(f'{DIR}/texts/leaderboard.txt', "w") as f:
         f.write(table_string)
