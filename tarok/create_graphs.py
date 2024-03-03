@@ -10,7 +10,16 @@ game_data = pd.read_csv(f'{DIR}/data/game_by_game_data.csv')
 PLAYERS = list(game_data.columns[1:])
 cmap = matplotlib.colormaps['Set2']
 COLORS = {PLAYERS[i]: f"rgb{(cmap(i)[0], cmap(i)[1], cmap(i)[2])}" for i in range(len(PLAYERS))}
-print(COLORS)
+
+
+def get_update_layout():
+    return dict(
+        plot_bgcolor="white",
+        xaxis={'visible': False},
+        yaxis={'visible': False},
+        showlegend=False,
+        margin=dict(r=20, t=20, b=20, l=20)
+    )
 
 
 def all_time_leaderboard():
@@ -36,13 +45,7 @@ def all_time_leaderboard():
                                  line=dict(color=COLORS[player])))
 
     # put the yaxis title on the right sides
-    fig.update_layout(
-        plot_bgcolor="white",
-        yaxis={'visible': False},
-        showlegend=False,
-        margin=dict(r=20, t=20, b=20, l=20),
-        xaxis={'visible': False}
-    )
+    fig.update_layout(get_update_layout())
 
     # compute the end score for each player
     end_scores = data.iloc[-1]
@@ -82,13 +85,7 @@ def last_n_leaderboard():
                                  line=dict(color=COLORS[player])))
 
     # put the yaxis title on the right sides
-    fig.update_layout(
-        plot_bgcolor="white",
-        showlegend=False,
-        margin=dict(r=20, t=20, b=20, l=20),
-        xaxis={'visible': False},
-        yaxis={'visible': False}
-    )
+    fig.update_layout(get_update_layout())
 
     # compute the end score for each player
     end_scores = data.iloc[-1]
@@ -242,14 +239,8 @@ def head_to_head():
                     text=text, texttemplate="%{text}", textfont={"size": 16},
                     colorscale=[(0, "red"), (0.5, "white"), (1, "green")]))
 
-    fig.update_layout(
-        showlegend=False,
-        plot_bgcolor="white",
-        coloraxis_showscale=False,
-        xaxis={"visible": False},
-        yaxis={"visible": False},
-        # margin=dict(l=200, r=200, t=50, b=50)
-    )
+    fig.update_layout(get_update_layout())
+
     fig.update_yaxes(
         scaleanchor="x",
         scaleratio=1,
@@ -327,13 +318,7 @@ def stevilo_zmag_skozi_cas():
             )
         )
 
-    fig.update_layout(
-        plot_bgcolor="white",
-        yaxis={'visible': False},
-        showlegend=False,
-        margin=dict(r=20, t=20, b=20, l=20),
-        xaxis={'visible': False}
-    )
+    fig.update_layout(get_update_layout())
 
     fig.show()
     fig.write_html(f'{DIR}/graphs/number_of_wins_over_time.html')
@@ -358,7 +343,6 @@ def create_leaderboard():
     points_per_player = points_per_player[sort_idx]
 
     link = "window.location.href='https://docs.google.com/spreadsheets/d/1Cv9EgP-gcNYhTOR2O9DxDBdSoSLT0iBg5lDCvBdx51E/edit?usp=sharing'"
-
 
 
     for player in PLAYERS_sorted:

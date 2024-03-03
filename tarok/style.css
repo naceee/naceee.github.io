@@ -1,4 +1,5 @@
-.my-button {
+
+button {
   background-color: #444;
   border: none;
   color: white;
@@ -6,21 +7,43 @@
   text-align: center;
   text-decoration: none;
   display: inline-block;
-  font-size: 16px;
+  font-size: 18px;
   margin: 4px 2px;
   cursor: pointer;
+  font-family: Arial, sans-serif;
 }
 
+.feeling-lucky-button {
+    position: absolute;
+    top: 50%;
+    -ms-transform: translateY(-50%);
+    transform: translateY(-60%);
+    right: 40%;
+}
+
+.next-button {
+  position: absolute;
+  top: 50%;
+  -ms-transform: translateY(-50%);
+  transform: translateY(-50%);
+}
+
+.naslovnica {
+  display: flex;
+  justify-content: left;
+  position: relative;
+  margin-top: 20px;
+}
+
+
 header h1 h2 h3{
+  text-align: center;
   font-family: Arial, sans-serif;
   line-height: 1.2;
 }
 
 body{
-  margin-top: 20px;
-  margin-right: 28%;
-  margin-bottom: 20px;
-  margin-left: 5%;
+  margin: 20px 28% 20px 5%;
   max-width:65%;
   line-height:1.6;
   font-size:18px;
@@ -35,6 +58,7 @@ iframe{
   width: 100%;
   border: none;
   margin-bottom: 3cm;
+  display:inline-block;
 }
 .table-container {
     position: fixed;
