@@ -300,7 +300,8 @@ def stevilo_zmag_skozi_cas():
         # add 0 at the beginning
         x = np.insert(x, 0, 0)
         y = np.insert(y, 0, 0)
-        fig.add_trace(go.Scatter(x=x, y=y, mode='lines', name=player, line=dict(color=COLORS[player])))
+        fig.add_trace(
+            go.Scatter(x=x, y=y, mode='lines', name=player, line=dict(color=COLORS[player])))
         fig.add_trace(go.Scatter(x=x, y=y, mode='markers',
                                  name=player, marker=dict(size=6, color=COLORS[player])))
 
@@ -322,6 +323,44 @@ def stevilo_zmag_skozi_cas():
 
     fig.show()
     fig.write_html(f'{DIR}/graphs/number_of_wins_over_time.html')
+
+
+def tarok_compass():
+    data = pd.read_csv(f'{DIR}/data/game_by_game_data.csv')[1:]
+    print(data["st_iger"].to_string())
+
+    for player in PLAYERS:
+        data[player] = data[player] / data["st_iger"]
+    data = data[PLAYERS]
+    std = data.std()
+    std = (std - std.mean()) / std.std()
+    mean = data.mean()
+    mean = (mean - mean.mean()) / mean.std()
+
+    fig = go.Figure()
+    for player in PLAYERS:
+        fig.add_trace(go.Scatter(
+            x=[mean[player]],
+            y=[std[player]],
+            mode='markers',
+            name=player,
+            marker=dict(size=10, color=COLORS[player]),
+            text=player
+        ))
+
+    max_x = max(abs(mean)) * 1.2
+    max_y = max(abs(std)) * 1.2
+
+    # plot x and y axis
+    fig.add_trace(go.Scatter(x=[-max_x, max_x], y=[0, 0], mode='lines', name="x axis", line=dict(color="black")))
+    fig.add_trace(go.Scatter(x=[0, 0], y=[-max_y, max_y], mode='lines', name="y axis", line=dict(color="black")))
+    fig.update_xaxes(range=[-max_x, max_x])
+    fig.update_yaxes(range=[-max_y, max_y])
+
+
+    fig.update_layout(get_update_layout())
+    fig.show()
+
 
 
 def create_leaderboard():
@@ -380,4 +419,5 @@ def update_all():
 
 
 if __name__ == '__main__':
-    update_all()
+    # update_all()
+    tarok_compass()
