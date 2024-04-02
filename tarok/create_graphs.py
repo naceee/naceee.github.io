@@ -3,6 +3,7 @@ import plotly.graph_objects as go
 import numpy as np
 import matplotlib
 import os
+from PIL import Image, ImageDraw
 
 DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -339,14 +340,31 @@ def tarok_compass():
 
     fig = go.Figure()
     for player in PLAYERS:
-        fig.add_trace(go.Scatter(
-            x=[mean[player]],
-            y=[std[player]],
-            mode='markers',
-            name=player,
-            marker=dict(size=10, color=COLORS[player]),
-            text=player
-        ))
+        img = Image.open(f"slike/{player.lower()}.jpg")
+        # make image circular
+        img = img.resize((img.width // 2, img.height // 2))
+        img = img.convert("RGBA")
+        mask = Image.new("L", img.size, 0)
+        mask_draw = ImageDraw.Draw(mask)
+
+        # make also circular fade out effect
+        mask_draw.ellipse((0.1*img.width, 0.1*img.height, 0.9*img.width, 0.9*img.height), fill=150)
+        mask_draw.ellipse((0.2*img.width, 0.2*img.height, 0.8*img.width, 0.8*img.height), fill=255)
+        # mask_draw.ellipse((0, 0) + img.size, fill=255)
+        img.putalpha(mask)
+
+        fig.add_layout_image(
+            source=img,
+            xref="x",
+            yref="y",
+            x=mean[player],
+            y=std[player],
+            sizing="contain",
+            sizex=0.4,
+            sizey=0.4,
+            xanchor="center",
+            yanchor="middle",
+        )
 
     max_x = max(abs(mean)) * 1.2
     max_y = max(abs(std)) * 1.2
@@ -357,6 +375,29 @@ def tarok_compass():
     fig.update_xaxes(range=[-max_x, max_x])
     fig.update_yaxes(range=[-max_y, max_y])
 
+    # make the plot square
+    fig.update_layout(width=900, height=900)
+
+    # make arrows for the axis
+    fig.add_annotation(
+        x=0.9*max_x,
+        y=0,
+        xref="x",
+        yref="y",
+        showarrow=True,
+        arrowhead=2,
+        arrowsize=1,
+        arrowwidth=2,
+        arrowcolor="black",
+        ax=0.9*max_x,
+        ay=0,
+        text="Tarok",
+        font=dict(
+            size=14,
+            color="black",
+            family="arial"
+        )
+    )
 
     fig.update_layout(get_update_layout())
     fig.show()
