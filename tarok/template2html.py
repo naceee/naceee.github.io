@@ -16,7 +16,7 @@ def template_to_html():
         if split_line[0] == "GRAPH:":
             html += '<div>\n'
             html += f'<iframe src="graphs/{split_line[1]}.html" width="100%" ' \
-                    f'height="650px"></iframe>\n'
+                    f'height="700px"></iframe>\n'
             html += '</div>\n'
 
         elif split_line[0] == "TEXT:":

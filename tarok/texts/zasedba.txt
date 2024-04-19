@@ -1,3 +1,5 @@
+<br>
+<h2>Zasedba</h2>
 <h3>Stalna zasedba</h3>
 <li> Peter: (falirani) študent kemije, član APZ TT, wikipedist, wannabe pisatelj, amaterski pianist </li>
 <li> Gašper: študent fizike, zaposlen na kemijskem inštitutu, plezalec, kolesar, organizator košarke </li>

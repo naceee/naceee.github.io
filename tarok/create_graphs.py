@@ -330,13 +330,25 @@ def tarok_compass():
     data = pd.read_csv(f'{DIR}/data/game_by_game_data.csv')[1:]
     print(data["st_iger"].to_string())
 
+    points = data[PLAYERS].sum()
+
     for player in PLAYERS:
         data[player] = data[player] / data["st_iger"]
+
+    igre = data["st_iger"]
     data = data[PLAYERS]
+    data2 = data.copy()
+    data2[~np.isnan(data2)] = 1
+    # row by row multiply the number of games with the number of wins
+    st_iger = data2.multiply(igre, axis=0).sum()
+
     std = data.std()
     std = (std - std.mean()) / std.std()
-    mean = data.mean()
+    mean = points / st_iger
+    print("mean\n", mean)
     mean = (mean - mean.mean()) / mean.std()
+    print("mean\n", mean)
+
 
     fig = go.Figure()
     for player in PLAYERS:
@@ -357,8 +369,8 @@ def tarok_compass():
             source=img,
             xref="x",
             yref="y",
-            x=mean[player],
-            y=std[player],
+            x=std[player],
+            y=mean[player],
             sizing="contain",
             sizex=0.4,
             sizey=0.4,
@@ -366,8 +378,8 @@ def tarok_compass():
             yanchor="middle",
         )
 
-    max_x = max(abs(mean)) * 1.2
-    max_y = max(abs(std)) * 1.2
+    max_x = max(abs(std)) * 1.2
+    max_y = max(abs(mean)) * 1.2
 
     # plot x and y axis
     fig.add_trace(go.Scatter(x=[-max_x, max_x], y=[0, 0], mode='lines', name="x axis", line=dict(color="black")))
@@ -379,29 +391,41 @@ def tarok_compass():
     fig.update_layout(width=900, height=900)
 
     # make arrows for the axis
-    fig.add_annotation(
-        x=0.9*max_x,
-        y=0,
-        xref="x",
-        yref="y",
-        showarrow=True,
-        arrowhead=2,
-        arrowsize=1,
-        arrowwidth=2,
-        arrowcolor="black",
-        ax=0.9*max_x,
-        ay=0,
-        text="Tarok",
-        font=dict(
-            size=14,
-            color="black",
-            family="arial"
+    texts = ["Konstanten", "Kaotičen", "Dober", "Slab"]
+    factors_x = [-0.9, 0.9, 0.02, 0.02]
+    factors_y = [0.05, 0.05, 0.9, -0.9]
+    anchors = ["center", "center", "left", "left"]
+    for i in range(4):
+        fig.add_annotation(
+            x=factors_x[i]*max_x,
+            y=factors_y[i]*max_y,
+            xref="x",
+            yref="y",
+            text=texts[i],
+            showarrow=False,
+            xanchor=anchors[i],
+            yanchor="middle",
+            font=dict(
+                size=20,
+                color="black",
+                family="arial"
+            )
         )
-    )
+
+    # add arrow heads
+    fig.add_trace(go.Scatter(x=[-0.03*max_x, 0, 0.03*max_x],
+                             y=[0.95*max_y, max_y, 0.95*max_y],
+                             mode='lines', line=dict(color="black")))
+    fig.add_trace(go.Scatter(x=[0.95*max_x, max_x, 0.95*max_x],
+                             y=[-0.03*max_y, 0, 0.03*max_y],
+                             mode='lines', line=dict(color="black")))
 
     fig.update_layout(get_update_layout())
-    fig.show()
+    # set the size of the plot to 500 x 500
+    fig.update_layout(width=680, height=680)
 
+    fig.show()
+    fig.write_html(f'{DIR}/graphs/tarok_compass.html')
 
 
 def create_leaderboard():
@@ -457,8 +481,9 @@ def update_all():
     stevilo_zmag_skozi_cas()
     create_leaderboard()
     last_n_leaderboard()
+    tarok_compass()
 
 
 if __name__ == '__main__':
-    # update_all()
-    tarok_compass()
+    update_all()
+

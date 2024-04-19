@@ -19,7 +19,7 @@ TEXT: leaderboard
 GRAPH: all_time_leaderboard
 TEXT: vecna_lestvica
 
-<h2>KDO JE V FORMI?</h2>
+<h2>FORMA/REJTING/KOK SI JAK ZADNJE ČASE</h2>
 GRAPH: last_n_leaderboard
 TEXT: forma
 
@@ -34,6 +34,9 @@ TEXT: kdo_koga
 <h2>VEČNA LESTVICA ZMAG</h2>
 GRAPH: number_of_wins_over_time
 TEXT: vecna_lestvica_zmag
+
+<h2>NEKI NEKI</h2>
+GRAPH: tarok_compass
 
 TEXT: zasedba
 
