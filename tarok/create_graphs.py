@@ -446,6 +446,14 @@ def create_leaderboard():
     PLAYERS_sorted = [PLAYERS[i] for i in sort_idx]
     points_per_player = points_per_player[sort_idx]
 
+    min_games = 400
+    players_with_less_games = st_iger[st_iger < min_games]
+    players_with_less_games_data = [(player, int(st_iger[player] / min_games * 100))
+                                    for player in players_with_less_games.index
+                                    if player != "Ostali" and
+                                    int(st_iger[player] / min_games * 100) >= 20]
+    players_with_less_games_data.sort(key=lambda x: x[1], reverse=True)
+
     link = "window.location.href='https://docs.google.com/spreadsheets/d/1Cv9EgP-gcNYhTOR2O9DxDBdSoSLT0iBg5lDCvBdx51E/edit?usp=sharing'"
 
 
@@ -453,7 +461,8 @@ def create_leaderboard():
         table_string += f'<tr><td>{player}</td><td>{int(st_iger[player])}</td>' \
                         f'<td>{int(points_per_player[player])}</td>' \
                         f'<td>{round(int(points_per_player[player])/int(st_iger[player]), 1)}</td></tr>\n'
-    table_string += f'</table>\n' \
+    table_string += f'</table>\n<br>\n' \
+                    f'{generate_html(players_with_less_games_data)}' \
                     f'<button class ="my-button" onclick="{link}"> VPIŠI TOČKE </button> \n' \
                     f'</div>\n'
 
@@ -461,29 +470,27 @@ def create_leaderboard():
         f.write(table_string)
 
 
-def normalizirana_lestvica():
-    data = pd.read_csv(f'{DIR}/data/game_by_game_data.csv')
-    data["min"] = data[PLAYERS].min(axis=1)
-    data["max"] = data[PLAYERS].max(axis=1) - data["min"]
-    data[PLAYERS] = data[PLAYERS] - data["min"].values.reshape(-1, 1)
-    data[PLAYERS] = data[PLAYERS] / data["max"].values.reshape(-1, 1)
-    data[PLAYERS] = data[PLAYERS] * data["st_iger"].values.reshape(-1, 1)
-
-    print(data)
-    points_per_player = data[PLAYERS].sum()
-    print(points_per_player)
+def generate_html(data):
+    html = '<div>\n<h4>Napredek do vključitve v grafe</h4>\n'
+    for name, percentage in data:
+        html += f'{name}\n'
+        html += f'<div style="width: 100%; height: 20px; background-color: #FFFFFF;">\n'
+        html += f'<div style="width: {percentage}%; height: 20px; background-color: #4CAF50; ' \
+                f'text-align: right; padding-right: 10px; font-size: 14px">{percentage}%</div>\n'
+        html += '</div><br>\n'
+    html += '</div>\n'
+    return html
 
 
 def update_all():
+    create_leaderboard()
     all_time_leaderboard()
     number_of_places()
     head_to_head()
     stevilo_zmag_skozi_cas()
-    create_leaderboard()
     last_n_leaderboard()
     tarok_compass()
 
 
 if __name__ == '__main__':
     update_all()
-
