@@ -36,13 +36,13 @@ def create_df_from_csv(all_players=False):
         # remove all other columns in MERGE_PLAYERS
         lines_df = lines_df.drop(columns=MERGE_PLAYERS[1:])
         # save the dataframe
-        lines_df.to_csv(f'{DIR}/data/game_by_game_data.csv', index=False)
+        lines_df.to_csv(f'{DIR}/data/games_data_merge_players.csv', index=False)
     else:
         lines_df.to_csv(f'{DIR}/data/leaderboard_data.csv', index=False)
 
 
 def create_df_with_wins_by_game():
-    data = pd.read_csv(f'{DIR}/data/game_by_game_data.csv')
+    data = pd.read_csv(f'{DIR}/data/games_data_merge_players.csv')
     games = data["st_iger"]
     data = data.drop(columns=["st_iger"])
     data = data.iloc[1:]
@@ -62,7 +62,7 @@ def create_df_with_wins_by_game():
 
 
 def create_df_with_games_by_one(n=200):
-    data = pd.read_csv(f'{DIR}/data/game_by_game_data.csv')
+    data = pd.read_csv(f'{DIR}/data/games_data_merge_players.csv')
     PLAYERS = data.columns[1:]
 
     games = data["st_iger"]

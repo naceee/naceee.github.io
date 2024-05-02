@@ -7,7 +7,7 @@ from PIL import Image, ImageDraw
 
 DIR = os.path.dirname(os.path.abspath(__file__))
 
-game_data = pd.read_csv(f'{DIR}/data/game_by_game_data.csv')
+game_data = pd.read_csv(f'{DIR}/data/games_data_merge_players.csv')
 PLAYERS = list(game_data.columns[1:])
 cmap = matplotlib.colormaps['Set2']
 COLORS = {PLAYERS[i]: f"rgb{(cmap(i)[0], cmap(i)[1], cmap(i)[2])}" for i in range(len(PLAYERS))}
@@ -24,7 +24,7 @@ def get_update_layout():
 
 
 def all_time_leaderboard():
-    data = pd.read_csv(f'{DIR}/data/game_by_game_data.csv')
+    data = pd.read_csv(f'{DIR}/data/games_data_merge_players.csv')
     # for each player, compute the cumulative sum of their played games as the cumsum of the column
     # "st. iger" for all the rows where the player is not NaN
     for player in PLAYERS:
@@ -185,7 +185,7 @@ def number_of_places():
 
 
 def head_to_head():
-    data = pd.read_csv(f'{DIR}/data/game_by_game_data.csv')
+    data = pd.read_csv(f'{DIR}/data/games_data_merge_players.csv')
     # for each player, count the number of wins against each other player
     data = data[PLAYERS]
     data = data.iloc[1:]
@@ -327,7 +327,7 @@ def stevilo_zmag_skozi_cas():
 
 
 def tarok_compass():
-    data = pd.read_csv(f'{DIR}/data/game_by_game_data.csv')[1:]
+    data = pd.read_csv(f'{DIR}/data/games_data_merge_players.csv')[1:]
     print(data["st_iger"].to_string())
 
     points = data[PLAYERS].sum()
@@ -352,7 +352,7 @@ def tarok_compass():
 
     fig = go.Figure()
     for player in PLAYERS:
-        img = Image.open(f"slike/{player.lower()}.jpg")
+        img = Image.open(f"{DIR}/slike/{player.lower()}.jpg")
         # make image circular
         img = img.resize((img.width // 2, img.height // 2))
         img = img.convert("RGBA")
