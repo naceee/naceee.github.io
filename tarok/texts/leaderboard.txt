@@ -2,10 +2,10 @@
 <table>
 <thead><tr><th>Igralec</th><th>Igre</th><th>Točke</th><th>na igro</th></tr></thead>
 <tr><td>Peter</td><td>2471</td><td>37180</td><td>15.0</td></tr>
-<tr><td>Jernej</td><td>2549</td><td>32426</td><td>12.7</td></tr>
-<tr><td>Nace</td><td>2042</td><td>31067</td><td>15.2</td></tr>
-<tr><td>Blaž</td><td>1896</td><td>29401</td><td>15.5</td></tr>
-<tr><td>Gašper</td><td>2102</td><td>26765</td><td>12.7</td></tr>
+<tr><td>Jernej</td><td>2565</td><td>32375</td><td>12.6</td></tr>
+<tr><td>Nace</td><td>2058</td><td>31098</td><td>15.1</td></tr>
+<tr><td>Blaž</td><td>1912</td><td>29678</td><td>15.5</td></tr>
+<tr><td>Gašper</td><td>2118</td><td>27795</td><td>13.1</td></tr>
 <tr><td>Klančar</td><td>219</td><td>3373</td><td>15.4</td></tr>
 <tr><td>Ostali</td><td>283</td><td>2826</td><td>10.0</td></tr>
 <tr><td>Žaži</td><td>213</td><td>2703</td><td>12.7</td></tr>
