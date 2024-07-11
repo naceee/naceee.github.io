@@ -8,9 +8,12 @@
 </head>
 <body>
     <div class="container">
-        <select id="dropdown1"></select>
-        <select id="dropdown2"></select>
-        <button onclick="handleButtonClick()">Click Me</button>
+        <input list="dropdown1-options" id="dropdown1" placeholder="Type your favourite cyclist...">
+        <datalist id="dropdown1-options"></datalist>
+
+        <input list="dropdown2-options" id="dropdown2" placeholder="Type another one...">
+        <datalist id="dropdown2-options"></datalist>
+        <button onclick="handleButtonClick()">Let's make a baby</button>
         <div id="result"></div> <!-- Placeholder for displaying selected values -->
     </div>
     <script src="script.js"></script>

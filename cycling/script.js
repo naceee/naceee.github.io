@@ -1,18 +1,19 @@
 
 document.addEventListener('DOMContentLoaded', () => {
-    populateDropdown('dropdown1', options);
-    populateDropdown('dropdown2', options);
+    populateDatalist('dropdown1-options', options);
+    populateDatalist('dropdown2-options', options);
 });
 
-function populateDropdown(dropdownId, options) {
-    const dropdown = document.getElementById(dropdownId);
+
+function populateDatalist(datalistId, options) {
+    const datalist = document.getElementById(datalistId);
     options.forEach(option => {
         const opt = document.createElement('option');
         opt.value = option;
-        opt.textContent = option;
-        dropdown.appendChild(opt);
+        datalist.appendChild(opt);
     });
 }
+
 
 function handleButtonClick() {
     const dropdown1 = document.getElementById('dropdown1').value;
