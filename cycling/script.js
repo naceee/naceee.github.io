@@ -79,7 +79,8 @@ function handleButtonClick() {
     console.log(perc1, perc2);
 
     // display the selected value and the similarities sim_p1 and sim_p2
-    document.getElementById('result').textContent = `A small ${selectedValue} is born.\n Similarity to ${dropdown1}: ${perc1}%, Similarity to ${dropdown2}: ${perc2}%`;
+    document.getElementById('result').textContent = `A small ${selectedValue} is born.`;
+    document.getElementById('result-explanaiton').textContent = `Similarity to ${dropdown1}: ${perc1}%, Similarity to ${dropdown2}: ${perc2}%`;
 
 }
 
