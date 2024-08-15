@@ -60,7 +60,7 @@ def all_time_leaderboard():
         fig.add_annotation(
             x=data[f"{player}_games"].iloc[-1],
             y=y_positions[player],
-            text=f"{player} {int(y_positions[player])}",
+            text=f"{player} {int(list(data[player])[-1])}",
             showarrow=False,
             xanchor="left",
             font=dict(
