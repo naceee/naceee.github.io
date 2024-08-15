@@ -1,14 +1,14 @@
 <div class="table-container">
 <table>
 <thead><tr><th>Igralec</th><th>Igre</th><th>Točke</th><th>na igro</th></tr></thead>
-<tr><td>Peter</td><td>2504</td><td>33032</td><td>13.2</td></tr>
-<tr><td>Jernej</td><td>2618</td><td>32760</td><td>12.5</td></tr>
-<tr><td>Nace</td><td>2111</td><td>31556</td><td>14.9</td></tr>
+<tr><td>Peter</td><td>2528</td><td>32895</td><td>13.0</td></tr>
+<tr><td>Jernej</td><td>2642</td><td>32808</td><td>12.4</td></tr>
+<tr><td>Nace</td><td>2135</td><td>31682</td><td>14.8</td></tr>
 <tr><td>Blaž</td><td>1945</td><td>30231</td><td>15.5</td></tr>
 <tr><td>Gašper</td><td>2118</td><td>27795</td><td>13.1</td></tr>
 <tr><td>Klančar</td><td>219</td><td>3373</td><td>15.4</td></tr>
 <tr><td>Ostali</td><td>283</td><td>2826</td><td>10.0</td></tr>
-<tr><td>Žaži</td><td>233</td><td>2188</td><td>9.4</td></tr>
+<tr><td>Žaži</td><td>257</td><td>2278</td><td>8.9</td></tr>
 <tr><td>Mica</td><td>199</td><td>961</td><td>4.8</td></tr>
 <tr><td>Kocjančič</td><td>40</td><td>332</td><td>8.3</td></tr>
 <tr><td>Ferjan</td><td>50</td><td>-3531</td><td>-70.6</td></tr>
@@ -18,7 +18,7 @@
 <h4>Napredek do vključitve v grafe</h4>
 Žaži
 <div style="width: 100%; height: 20px; background-color: #FFFFFF;">
-<div style="width: 58%; height: 20px; background-color: #4CAF50; text-align: right; padding-right: 10px; font-size: 14px">58%</div>
+<div style="width: 64%; height: 20px; background-color: #4CAF50; text-align: right; padding-right: 10px; font-size: 14px">64%</div>
 </div><br>
 Klančar
 <div style="width: 100%; height: 20px; background-color: #FFFFFF;">
