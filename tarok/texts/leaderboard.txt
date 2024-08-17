@@ -1,44 +1,32 @@
 <div class="table-container">
 <table>
 <thead><tr><th>Igralec</th><th>Igre</th><th>Runde</th><th>Točke</th><th>na igro</th></tr></thead>
-<tr><td>Peter</td><td>104.0</td<td>2528.0</td><td>32895.0</td><td>13.0</td></tr>
-<tr><td>Jernej</td><td>105.0</td<td>2642.0</td><td>32808.0</td><td>12.4</td></tr>
-<tr><td>Nace</td><td>88.0</td<td>2135.0</td><td>31682.0</td><td>14.8</td></tr>
-<tr><td>Blaž</td><td>78.0</td<td>1945.0</td><td>30231.0</td><td>15.5</td></tr>
-<tr><td>Gašper</td><td>83.0</td<td>2118.0</td><td>27795.0</td><td>13.1</td></tr>
-<tr><td>Klančar</td><td>11.0</td<td>219.0</td><td>3373.0</td><td>15.4</td></tr>
-<tr><td>Ostali</td><td>9.0</td<td>283.0</td><td>2826.0</td><td>10.0</td></tr>
-<tr><td>Žaži</td><td>13.0</td<td>257.0</td><td>2278.0</td><td>8.9</td></tr>
-<tr><td>Mica</td><td>5.0</td<td>199.0</td><td>961.0</td><td>4.8</td></tr>
-<tr><td>Kocjančič</td><td>2.0</td<td>40.0</td><td>332.0</td><td>8.3</td></tr>
-<tr><td>Ferjan</td><td>2.0</td<td>50.0</td><td>-3531.0</td><td>-70.6</td></tr>
+<tr><td>Peter</td><td>104</td><td>2528</td><td>32895</td><td>13.0</td></tr>
+<tr><td>Jernej</td><td>105</td><td>2642</td><td>32808</td><td>12.4</td></tr>
+<tr><td>Nace</td><td>88</td><td>2135</td><td>31682</td><td>14.8</td></tr>
+<tr><td>Blaž</td><td>78</td><td>1945</td><td>30231</td><td>15.5</td></tr>
+<tr><td>Gašper</td><td>83</td><td>2118</td><td>27795</td><td>13.1</td></tr>
+<tr><td>Klančar</td><td>11</td><td>219</td><td>3373</td><td>15.4</td></tr>
+<tr><td>Ostali</td><td>9</td><td>283</td><td>2826</td><td>10.0</td></tr>
+<tr><td>Žaži</td><td>13</td><td>257</td><td>2278</td><td>8.9</td></tr>
+<tr><td>Mica</td><td>5</td><td>199</td><td>961</td><td>4.8</td></tr>
+<tr><td>Kocjančič</td><td>2</td><td>40</td><td>332</td><td>8.3</td></tr>
+<tr><td>Ferjan</td><td>2</td><td>50</td><td>-3531</td><td>-70.6</td></tr>
 </table>
 <br>
 <div>
 <h4>Napredek do vključitve v grafe</h4>
-Kocjančič
+Žaži
 <div style="width: 100%; height: 20px; background-color: #FFFFFF;">
-<div style="width: 10%; height: 20px; background-color: #4CAF50; text-align: right; padding-right: 10px; font-size: 14px">10%</div>
-</div><br>
-Ferjan
-<div style="width: 100%; height: 20px; background-color: #FFFFFF;">
-<div style="width: 12%; height: 20px; background-color: #4CAF50; text-align: right; padding-right: 10px; font-size: 14px">12%</div>
-</div><br>
-Mica
-<div style="width: 100%; height: 20px; background-color: #FFFFFF;">
-<div style="width: 50%; height: 20px; background-color: #4CAF50; text-align: right; padding-right: 10px; font-size: 14px">50%</div>
+<div style="width: 64%; height: 20px; background-color: #4CAF50; text-align: right; padding-right: 10px; font-size: 14px">64%</div>
 </div><br>
 Klančar
 <div style="width: 100%; height: 20px; background-color: #FFFFFF;">
 <div style="width: 55%; height: 20px; background-color: #4CAF50; text-align: right; padding-right: 10px; font-size: 14px">55%</div>
 </div><br>
-Žaži
+Mica
 <div style="width: 100%; height: 20px; background-color: #FFFFFF;">
-<div style="width: 64%; height: 20px; background-color: #4CAF50; text-align: right; padding-right: 10px; font-size: 14px">64%</div>
-</div><br>
-Ostali
-<div style="width: 100%; height: 20px; background-color: #FFFFFF;">
-<div style="width: 71%; height: 20px; background-color: #4CAF50; text-align: right; padding-right: 10px; font-size: 14px">71%</div>
+<div style="width: 50%; height: 20px; background-color: #4CAF50; text-align: right; padding-right: 10px; font-size: 14px">50%</div>
 </div><br>
 </div>
 <button class ="my-button" onclick="window.location.href='https://docs.google.com/spreadsheets/d/1Cv9EgP-gcNYhTOR2O9DxDBdSoSLT0iBg5lDCvBdx51E/edit?usp=sharing'"> VPIŠI TOČKE </button> 

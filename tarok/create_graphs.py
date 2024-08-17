@@ -192,8 +192,8 @@ def create_leaderboard():
     table_string = '<div class="table-container">\n<table>\n<thead><tr><th>' \
                    'Igralec</th><th>Igre</th><th>Runde</th><th>Točke</th><th>na igro</th></tr></thead>\n'
     for player, row in data.iterrows():
-        table_string += f'<tr><td>{player}</td><td>{row["games"]}</td<td>{row["rounds"]}</td>' \
-                        f'<td>{row["points"]}</td>' \
+        table_string += f'<tr><td>{player}</td><td>{int(row["games"])}</td>' \
+                        f'<td>{int(row["rounds"])}</td><td>{int(row["points"])}</td>' \
                         f'<td>{round(row["points_per_round"], 1)}</td></tr>\n'
     table_string += f'</table>\n<br>\n' \
                     f'{generate_html(players_with_less_games, min_rounds)}' \
@@ -205,9 +205,12 @@ def create_leaderboard():
 
 
 def generate_html(data, min_rounds=400):
+    data = data.sort_values("rounds", ascending=False)
     html = '<div>\n<h4>Napredek do vključitve v grafe</h4>\n'
     for player, row in data.iterrows():
         percentage = round(row["rounds"] / min_rounds * 100)
+        if percentage < 20 or player == "Ostali":
+            continue
         html += f'{player}\n'
         html += f'<div style="width: 100%; height: 20px; background-color: #FFFFFF;">\n'
         html += f'<div style="width: {percentage}%; height: 20px; background-color: #4CAF50; ' \
@@ -223,6 +226,7 @@ def update_all():
     head_to_head()
     wins_over_time()
     last_n_leaderboard()
+    create_leaderboard()
 
 
 if __name__ == '__main__':
