@@ -4,6 +4,7 @@ import pandas as pd
 import numpy as np
 from heapq import nlargest
 import os
+import json
 
 DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -19,38 +20,35 @@ def download_as_csv():
         f.write(response.content)
 
 
-def create_df_from_csv(all_players=False):
-    # read the csv file line by line
-    with open(f'{DIR}/data/raw_data.csv', 'r') as f:
-        lines = f.readlines()
-    # remove the first line
-    lines = lines[2:]
-    lines = [l.split(",")[2:14] for l in lines if l[1] != ","]
-    lines[1] = ["", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"]
+def csv_to_df(merge_players=False):
+    # do the same with pandas
+    df = pd.read_csv(f'{DIR}/data/raw_data.csv')
+    df = df.iloc[:, 1:]
 
-    lines_df = pd.DataFrame(lines[1:], columns=lines[0])
-    lines_df = lines_df.apply(pd.to_numeric, errors='ignore')
-    # from the columns in MERGE_PLAYERS create a new column with the max value of the columns
-    if all_players:
-        lines_df["Ostali"] = lines_df[MERGE_PLAYERS].max(axis=1)
+    if merge_players:
+        df["Ostali"] = df[MERGE_PLAYERS].max(axis=1)
         # remove all other columns in MERGE_PLAYERS
-        lines_df = lines_df.drop(columns=MERGE_PLAYERS[1:])
+        df = df.drop(columns=MERGE_PLAYERS[1:])
         # save the dataframe
-        lines_df.to_csv(f'{DIR}/data/games_data_merge_players.csv', index=False)
+        df.to_csv(f'{DIR}/data/games_data_merge_players.csv', index=False)
+        return list(df.columns[1:])
     else:
-        lines_df.to_csv(f'{DIR}/data/leaderboard_data.csv', index=False)
+        df.to_csv(f'{DIR}/data/leaderboard_data.csv', index=False)
+        return list(df.columns[1:])
 
 
-def create_df_with_wins_by_game():
+def wins_by_game_df():
     data = pd.read_csv(f'{DIR}/data/games_data_merge_players.csv')
     games = data["st_iger"]
     data = data.drop(columns=["st_iger"])
-    data = data.iloc[1:]
     data = data.fillna(-np.inf)
 
     def f(row):
-        x = nlargest(4, enumerate(row.to_list()), key=lambda x: x[1])
-        for i in range(4):
+        # get the 4 largest values and their indices and make sure the numbers are bigger than 0
+
+        x = nlargest(4, enumerate(row.to_list()), key=lambda y: y[1])
+        x = [(i, j) for i, j in x if j > -np.inf]
+        for i in range(len(x)):
             row[x[i][0]] = i + 1
 
     data.apply(f, axis=1)
@@ -61,11 +59,10 @@ def create_df_with_wins_by_game():
     data.to_csv(f'{DIR}/data/wins_by_game.csv', index=False)
 
 
-def create_df_with_games_by_one(n=200):
+def last_games_by_one_df(n=200):
     data = pd.read_csv(f'{DIR}/data/games_data_merge_players.csv')
     PLAYERS = data.columns[1:]
 
-    games = data["st_iger"]
     new_data = {p: None for p in PLAYERS}
     for player in PLAYERS:
         player_points = data[player]
@@ -99,12 +96,168 @@ def create_df_with_games_by_one(n=200):
     df.to_csv(f'{DIR}/data/last_n_games.csv', index=False)
 
 
+def leaderboard_cumsum_df(players):
+    data = pd.read_csv(f'{DIR}/data/games_data_merge_players.csv')
+    # for each player, compute the cumulative sum of their played games as the cumsum of the column
+    # "st.iger" for all the rows where the player is not NaN
+    for player in players:
+        f = lambda igra, pl: igra if not np.isnan(pl) else 0
+        data[f"{player}_games"] = data.apply(lambda x: f(x.st_iger, x[f"{player}"]), axis=1)
+        data[f"{player}_games"] = data[f"{player}_games"].cumsum()
+
+    # change Nan to 0
+    data = data.fillna(0)
+    for player in players:
+        data[player] = data[player].cumsum()
+
+    # save the dataframe
+    data.to_csv(f'{DIR}/data/leaderboard_cumsum.csv', index=False)
+
+
+def number_of_places_df(players):
+    data = pd.read_csv(f'{DIR}/data/wins_by_game.csv')
+    data = data[players]
+    data = data.apply(pd.value_counts)
+    counts = data.sum(axis=0)
+    # make counts a dataframe with players as columns
+    counts = pd.DataFrame(counts).T
+    counts.to_csv(f'{DIR}/data/num_played_games.csv', index=False)
+
+
+    # divide each column by its sum:
+    for player in players:
+        data[player] = data[player] / data[player].sum()
+        # round to 2 decimals
+        data[player] = data[player].apply(lambda x: round(x * 100, 2))
+
+    players_with_wins = list(zip(list(data.iloc[0]), list(data.columns)))
+    players_with_wins.sort(reverse=True)
+    sorted_players = [p[1] for p in players_with_wins]
+    data = data[sorted_players]
+
+    # save the dataframe
+    data.to_csv(f'{DIR}/data/number_of_places.csv', index=False)
+
+
+def head_to_head_matrix(players):
+    data = pd.read_csv(f'{DIR}/data/games_data_merge_players.csv')
+    # for each player, count the number of wins against each other player
+    data = data[players]
+    data = data.iloc[1:]
+    matrix = np.zeros((len(players), len(players)))
+
+    for p1 in players:
+        for p2 in players:
+            data[f"{p1}_{p2}"] = data[p1] > data[p2]
+            print(players, p1, p2)
+            matrix[players.index(p1), players.index(p2)] = data[f"{p1}_{p2}"].sum()
+
+    for i in range(len(players)):
+        matrix[i, i] = np.nan
+        for j in range(i + 1, len(players)):
+            matrix[i, j] = matrix[i, j] / (matrix[i, j] + matrix[j, i])
+            matrix[j, i] = 1 - matrix[i, j]
+
+    order_counts = []
+    for i in range(len(players)):
+        count1 = (matrix[i, :] > 0.5).sum() + 0.5 * (matrix[:, i] == 0.5).sum()
+        # count the total values that are not nan
+        count2 = matrix[i, ~np.isnan(matrix[i, :])].sum()
+        order_counts.append(count1 + count2)
+
+    player_idx = np.array(np.argsort(order_counts), dtype=int)[::-1]
+
+    matrix = matrix * 100
+
+    text = matrix.copy()
+    text = np.round(text, 1)
+    text = text.astype(str)
+    text[text == "nan"] = ""
+    for i in range(len(players)):
+        for j in range(len(players)):
+            if text[i, j] != "":
+                text[i, j] += "%"
+
+    matrix[:, :] = matrix[player_idx, :]
+    text[:, :] = text[player_idx, :]
+
+    matrix[:, :] = matrix[:, player_idx]
+    text[:, :] = text[:, player_idx]
+
+    # flip the matrix upside down
+    matrix = np.flip(matrix, axis=0)
+    text = np.flip(text, axis=0)
+
+    matrix = np.round(matrix, 1)
+
+    PLAYER_NAMES = np.array(players.copy())[player_idx]
+    print(PLAYER_NAMES)
+
+    h2h_df = pd.DataFrame(matrix, columns=PLAYER_NAMES)
+
+    h2h_df.to_csv(f'{DIR}/data/head_to_head.csv', index=False)
+
+def wins_over_time_json(players):
+    data = pd.read_csv(f'{DIR}/data/wins_by_game.csv')
+    data = data[players]
+    data[data > 1] = 0
+
+    plot_data = data.copy()
+    for player in players:
+        plot_data[f"{player}_y"] = data[player].cumsum()
+
+    plot_data = plot_data[[f"{player}_y" for player in players]]
+    data_dict = {}
+    for player in players:
+        y = np.array(plot_data[f"{player}_y"])
+        # remove nan values
+        y = y[~np.isnan(y)]
+        # add 0 to the beginning
+        data_dict[f"{player}_y"] = [0] + y.tolist()
+
+    # save data dict to json:
+    with open(f'{DIR}/data/wins_over_time.json', 'w') as f:
+        json.dump(data_dict, f, indent=4)
+
+
+def leaderboard_df():
+    data = pd.read_csv(f'{DIR}/data/leaderboard_data.csv')
+
+    players = list(data.columns[1:])
+    points_per_player = data[players].sum()
+    # put all the non nan elements to 1
+    game_lengths = data["st_iger"]
+    data = data[players]
+    data[~np.isnan(data)] = 1
+    # row by row multiply the number of games with the number of wins
+    num_games = data.sum()
+    num_rounds = data.multiply(game_lengths, axis=0).sum()
+
+    # combine points_per_player, num_games and num_round into a dataframe
+    df = pd.DataFrame({"points": points_per_player, "games": num_games, "rounds": num_rounds})
+    # cast to int
+    df = df.astype(int)
+    df["points_per_round"] = df["points"] / df["rounds"]
+
+    # sort players by points
+    sort_idx = np.argsort(points_per_player)[::-1]
+    df = df.iloc[sort_idx]
+
+    # save
+    df.to_csv(f'{DIR}/data/totals.csv')
+
+
 def save_all():
     download_as_csv()
-    create_df_from_csv(all_players=True)
-    create_df_from_csv(all_players=False)
-    create_df_with_wins_by_game()
-    create_df_with_games_by_one()
+    players = csv_to_df(merge_players=True)
+    all_players = csv_to_df(merge_players=False)
+    wins_by_game_df()
+    last_games_by_one_df()
+    leaderboard_cumsum_df(players)
+    number_of_places_df(players)
+    head_to_head_matrix(players)
+    wins_over_time_json(players)
+    leaderboard_df()
 
 
 if __name__ == '__main__':

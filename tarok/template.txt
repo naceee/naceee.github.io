@@ -35,9 +35,6 @@ TEXT: kdo_koga
 GRAPH: number_of_wins_over_time
 TEXT: vecna_lestvica_zmag
 
-<h2>NEKI NEKI</h2>
-GRAPH: tarok_compass
-
 TEXT: zasedba
 
 </main>
