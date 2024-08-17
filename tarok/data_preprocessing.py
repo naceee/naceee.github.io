@@ -149,7 +149,6 @@ def head_to_head_matrix(players):
     for p1 in players:
         for p2 in players:
             data[f"{p1}_{p2}"] = data[p1] > data[p2]
-            print(players, p1, p2)
             matrix[players.index(p1), players.index(p2)] = data[f"{p1}_{p2}"].sum()
 
     for i in range(len(players)):
@@ -168,34 +167,17 @@ def head_to_head_matrix(players):
     player_idx = np.array(np.argsort(order_counts), dtype=int)[::-1]
 
     matrix = matrix * 100
-
-    text = matrix.copy()
-    text = np.round(text, 1)
-    text = text.astype(str)
-    text[text == "nan"] = ""
-    for i in range(len(players)):
-        for j in range(len(players)):
-            if text[i, j] != "":
-                text[i, j] += "%"
-
     matrix[:, :] = matrix[player_idx, :]
-    text[:, :] = text[player_idx, :]
-
     matrix[:, :] = matrix[:, player_idx]
-    text[:, :] = text[:, player_idx]
-
-    # flip the matrix upside down
     matrix = np.flip(matrix, axis=0)
-    text = np.flip(text, axis=0)
-
     matrix = np.round(matrix, 1)
 
     PLAYER_NAMES = np.array(players.copy())[player_idx]
-    print(PLAYER_NAMES)
 
     h2h_df = pd.DataFrame(matrix, columns=PLAYER_NAMES)
 
     h2h_df.to_csv(f'{DIR}/data/head_to_head.csv', index=False)
+
 
 def wins_over_time_json(players):
     data = pd.read_csv(f'{DIR}/data/wins_by_game.csv')

@@ -129,6 +129,11 @@ def head_to_head():
     text = matrix.copy()
     text = text.astype(str)
     text[text == "nan"] = ""
+    for i in range(len(matrix)):
+        for j in range(len(matrix)):
+            if text[i, j] == "":
+                continue
+            text[i, j] += "%"
     PLAYER_NAMES = list(data.columns)
 
     g = Graph(annotation_size=18, margins=dict(r=20, t=30, b=10, l=20))
@@ -181,7 +186,6 @@ def wins_over_time():
 
 def create_leaderboard():
     data = pd.read_csv(f'{DIR}/data/totals.csv', index_col=0)
-    PLAYERS_sorted = data.index
 
     min_rounds = 400
     players_with_less_games = data[data["rounds"] < min_rounds]
