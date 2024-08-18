@@ -324,8 +324,8 @@ def update_all():
     last_n_leaderboard()
     create_leaderboard()
     points_violin_plot()
+    moving_bar_chart_leaderboard()
 
 
 if __name__ == '__main__':
-    # update_all()
-    moving_bar_chart_leaderboard()
+    update_all()
