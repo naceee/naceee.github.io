@@ -2,6 +2,7 @@ import json
 
 import pandas as pd
 import plotly.graph_objects as go
+from plotly.colors import n_colors
 import numpy as np
 import matplotlib
 import os
@@ -184,6 +185,97 @@ def wins_over_time():
     g.show_and_save("number_of_wins_over_time")
 
 
+def points_violin_plot():
+    data = pd.read_csv(f'{DIR}/data/games_data_merge_players.csv')
+    num_rounds = data.iloc[:, 0]
+    data = data.iloc[:, 1:]
+    # get the average points per round
+    data = data.div(num_rounds, axis=0)
+
+    players = list(data.columns)
+    data = data.values
+    colors = n_colors('rgb(5, 200, 200)', 'rgb(200, 10, 10)', len(players), colortype='rgb')
+
+    g = Graph(annotation_size=18)
+    for i, color in enumerate(colors):
+        player_data = data[:, i]
+        # remove nan values
+        player_data = player_data[~np.isnan(player_data)]
+        g.fig.add_trace(go.Violin(x=player_data, line_color=color))
+        # annotate the worst, best and mean for each player
+        g.add_annotations(
+            [[player_data.min(), i, f"{round(player_data.min(), 1)}", color],
+             [player_data.max(), i, f"{round(player_data.max(), 1)}", color]],
+            xanchor="center",
+            yanchor="top"
+        )
+        # add names
+        g.add_annotations(
+            [[-30, i + 0.25, players[i], color]],
+            xanchor="right",
+            yanchor="middle"
+        )
+
+    g.fig.update_traces(orientation='h', side='positive', width=3, points='outliers',
+                        meanline_visible=True)
+    g.update_layout()
+    g.show_and_save("points_violin_plot")
+
+
+def moving_bar_chart_leaderboard():
+    data = pd.read_csv(f'{DIR}/data/leaderboard_cumsum.csv')
+    # plot the data using plotly
+    data = data[PLAYERS]
+    data = data.values
+    indices = np.argsort(data, axis=1)
+    np_players = np.array(PLAYERS)
+
+    print([COLORS[player] for player in np_players])
+
+    g = Graph(margins=dict(r=20, t=20, b=50, l=20), annotation_size=18)
+    g.fig = go.Figure(
+        data=[go.Bar(
+            y=np_players[indices[0]],
+            x=[0 for _ in np_players],
+            marker_color=[COLORS[player] for player in np_players[indices[0]]],
+            orientation='h'
+        )],
+        layout=go.Layout(
+            yaxis=dict(range=[-0.6, len(PLAYERS) - 0.4], autorange=False),
+            xaxis=dict(range=[data.min(), data.max() * 1.05], autorange=False),
+            updatemenus=[dict(
+                type="buttons",
+                x=0.5,
+                y=1.1,
+                direction="left",
+                buttons=[
+                    dict(
+                        label="▶",
+                        method="animate",
+                        args=[None, {"frame": {"duration": 200, "redraw": True},
+                                     "fromcurrent": True, "transition": {"duration": 0, "easing": "linear"}}]
+                    ),
+                    dict(
+                        label="◼",
+                        method="animate",
+                        args=[[None], {"frame": {"duration": 0, "redraw": False},
+                                       "mode": "immediate", "transition": {"duration": 0}}],
+                    )
+                ]
+            )]
+        ),
+        frames=[go.Frame(data=[go.Bar(
+            y=np_players[indices[i]],
+            x=data[i][indices[i]],
+            marker_color=[COLORS[player] for player in np_players[indices[i]]],
+            orientation='h'
+        )]) for i in range(len(data))]
+    )
+
+    g.update_layout(xaxis={'visible': True}, yaxis={'visible': True})
+    g.show_and_save("moving_bar_chart_leaderboard")
+
+
 def create_leaderboard():
     data = pd.read_csv(f'{DIR}/data/totals.csv', index_col=0)
 
@@ -231,7 +323,9 @@ def update_all():
     wins_over_time()
     last_n_leaderboard()
     create_leaderboard()
+    points_violin_plot()
 
 
 if __name__ == '__main__':
-    update_all()
+    # update_all()
+    moving_bar_chart_leaderboard()

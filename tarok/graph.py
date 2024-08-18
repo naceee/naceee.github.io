@@ -15,15 +15,15 @@ class Graph:
             setattr(self, key, value)
 
     def update_layout(self, **kwargs):
-        self.fig.update_layout(dict(
-                plot_bgcolor="white",
-                xaxis={'visible': False},
-                yaxis={'visible': False},
-                showlegend=False,
-                margin=dict(self.margins),
-                **kwargs
-            )
+        default_values = dict(
+            plot_bgcolor="white",
+            xaxis={'visible': False},
+            yaxis={'visible': False},
+            showlegend=False,
+            margin=dict(self.margins)
         )
+        default_values.update(kwargs)
+        self.fig.update_layout(**default_values)
 
     def show_and_save(self, filename):
         self.fig.show()

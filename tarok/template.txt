@@ -37,6 +37,10 @@ TEXT: vecna_lestvica_zmag
 
 TEXT: zasedba
 
+GRAPH: moving_bar_chart_leaderboard
+
+GRAPH: points_violin_plot
+
 </main>
 <footer>
 
