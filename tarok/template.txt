@@ -35,11 +35,13 @@ TEXT: kdo_koga
 GRAPH: number_of_wins_over_time
 TEXT: vecna_lestvica_zmag
 
-TEXT: zasedba
-
+<h2>PREMIKAJOČA SE VEČNA LESTVICA AL NEKI</h2>
 GRAPH: moving_bar_chart_leaderboard
 
+<h2>RAZPOREDITEV TOČK PO IGRAH</h2>
 GRAPH: points_violin_plot
+
+TEXT: zasedba
 
 </main>
 <footer>
