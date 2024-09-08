@@ -1,0 +1,101 @@
+* {
+    margin:0;
+}
+
+body {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+}
+
+#container {
+    position: absolute;
+    top: 0px;
+    bottom: 0px;
+    left: 0px;
+    right: -17px;
+    overflow: auto;
+}
+
+
+#slika {
+    margin-bottom: 20px;
+}
+
+html {
+    height: 100%;
+    overflow:hidden;
+}
+
+img {
+    width: 100%;
+    height: auto;
+}
+
+
+/* Heading styles */
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Georgia', serif; /* Serif font for the header title */
+    color: #333; /* Dark gray color */
+    margin-bottom: 20px; /* Space below headings */
+    margin-top: 40px; /* Space above headings */
+    margin-left: 50px; /* Space to the left of headings */
+    line-height: 1.2; /* Line height for readability */
+}
+
+h2 {
+    font-size: 2em; /* 24px font size */
+}
+
+p {
+    font-family: Georgia, serif; /* Use a sans-serif font for paragraphs */
+    color: #666; /* Medium gray color */
+    margin-bottom: 20px; /* Space below paragraphs */
+    margin-left: 20px; /* Space to the left of paragraphs */
+    line-height: 1.5; /* Line height for readability */
+}
+
+
+/* Header styling */
+header {
+    background-color: #333; /* Dark background color */
+    color: white; /* White text color */
+    padding: 20px; /* Padding around the header */
+    margin-top: -10px;
+    text-align: center; /* Center-align text */
+}
+
+header h1 {
+    font-size: 2.5em; /* Larger font size for the header title */
+    color: white; /* White text color */
+    margin: 0; /* Remove default margin */
+    margin-bottom: 5px;
+    font-family: 'Georgia', serif; /* Serif font for the header title */
+}
+
+header nav {
+    margin-top: 0px; /* Space above the navigation menu */
+}
+
+header nav ul {
+    list-style-type: none; /* Remove default list styling */
+    padding: 0; /* Remove default padding */
+    margin: 0; /* Remove default margin */
+}
+
+header nav ul li {
+    display: inline; /* Display list items inline */
+    margin-right: 15px; /* Space between menu items */
+}
+
+header nav ul li a {
+    color: white; /* White text color for links */
+    text-decoration: none; /* Remove underline from links */
+    font-size: 1.2em; /* Slightly larger font size for links */
+    font-family: 'Arial', sans-serif; /* Sans-serif font for links */
+}
+
+header nav ul li a:hover {
+    text-decoration: underline; /* Underline links on hover */
+}
