@@ -1,19 +1,29 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/html">
+<html lang="en">
 <head>
-    <title>My Page</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
+    <title>Nace Sever</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- LaTeX CSS -->
+    <link rel="stylesheet" href="https://latex.vercel.app/style.css">
+    <link rel="stylesheet" href="style_latex.css">
+
 </head>
 <body>
-    <header>
-        <h1>TAROK</h1>
+
+    <!-- Header Section -->
+    <header class="container-fluid text-center">
+        <div class="container">
+            <h1 class="display-4 author" margin-top="1rem" margin-bottom="1rem">Tarok</h1>
+        </div>
     </header>
 
-    <main>
+<h2> Uvod </h2>
 
 TEXT: leaderboard
+
 
 <h2>MENI JE VSEENO ZA VEČNO LESTVICO</h2>
 GRAPH: all_time_leaderboard
@@ -42,6 +52,12 @@ GRAPH: moving_bar_chart_leaderboard
 GRAPH: points_violin_plot
 
 TEXT: zasedba
+
+<!-- Bootstrap JS and dependencies -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
 
 </main>
 <footer>

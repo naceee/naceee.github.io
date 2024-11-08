@@ -285,16 +285,18 @@ def create_leaderboard():
     players_with_less_games = players_with_less_games.sort_values("rounds")
 
     link = "window.location.href='https://docs.google.com/spreadsheets/d/1Cv9EgP-gcNYhTOR2O9DxDBdSoSLT0iBg5lDCvBdx51E/edit?usp=sharing'"
-    table_string = '<div class="table-container">\n<table>\n<thead><tr><th>' \
+    table_string = '<div>\n<table id="central_table">\n<thead><tr><th>' \
                    'Igralec</th><th>Igre</th><th>Runde</th><th>Točke</th><th>na igro</th></tr></thead>\n'
     for player, row in data.iterrows():
         table_string += f'<tr><td>{player}</td><td>{int(row["games"])}</td>' \
                         f'<td>{int(row["rounds"])}</td><td>{int(row["points"])}</td>' \
                         f'<td>{round(row["points_per_round"], 1)}</td></tr>\n'
-    table_string += f'</table>\n<br>\n' \
-                    f'{generate_html(players_with_less_games, min_rounds)}' \
-                    f'<button class ="my-button" onclick="{link}"> VPIŠI TOČKE </button> \n' \
-                    f'</div>\n'
+    table_string += '</table>\n</div>'
+
+    #table_string += f'</table>\n<br>\n' \
+    #                f'{generate_html(players_with_less_games, min_rounds)}' \
+    #                f'<button class ="my-button" onclick="{link}"> VPIŠI TOČKE </button> \n' \
+    #                f'</div>\n'
 
     with open(f'{DIR}/texts/leaderboard.txt', "w") as f:
         f.write(table_string)

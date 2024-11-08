@@ -5,7 +5,7 @@ import time
 
 
 def main():
-    save_all()
+    #save_all()
     time.sleep(1)
     update_all()
     time.sleep(1)

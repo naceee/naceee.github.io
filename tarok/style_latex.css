@@ -1,0 +1,85 @@
+h1 {
+
+}
+
+#central_table {
+    margin: 0 auto;
+}
+
+.container {
+    max-width: 100%;
+}
+
+/* Media query for screens larger than 576px */
+@media (min-width: 576px) {
+    .container {
+        max-width: 80%;
+    }
+}
+/* Remove outline and highlight effects for navbar links */
+.nav-link {
+    outline: none; /* Remove outline on focus */
+    box-shadow: none; /* Remove any box shadow effect */
+    text-decoration: none; /* Remove underline if it appears */
+}
+
+.nav-link:focus, .nav-link:active {
+    outline: none; /* Remove the blue outline */
+    box-shadow: none; /* Remove any box shadow effect */
+}
+.navbar-brand {
+    outline: none;
+    box-shadow: none;
+}
+
+/* Optional: Prevent link text from being highlighted */
+.nav-link:focus, .nav-link:active {
+    background-color: transparent; /* No background change on focus */
+    color: inherit; /* Maintain original text color */
+}
+/* Adjust font size and line height */
+body {
+    max-width: 128ch;
+    font-size: 1rem;
+    line-height: 1.5;
+}
+        /* Remove any list-style or numbering in the navbar */
+.navbar-nav {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.navbar-nav li::before {
+    content: none; /* Remove any custom content added by LaTeX.css */
+}
+/* Optional: If specific classes are defined, increase their font size too */
+body {
+    font-size: calc(1rem + 2pt); /* Increase base font size */
+}/* Use the dark mode styles from LaTeX.css for the navbar */
+body.latex-dark .navbar {
+    background-color: var(--latex-dark-background); /* Use the dark background from LaTeX.css */
+    color: var(--latex-light-text); /* Use the light text color from LaTeX.css */
+}
+
+body.latex-dark .navbar .nav-link {
+    color: var(--latex-light-text); /* Light text color for nav links */
+}
+
+body.latex-dark .navbar .nav-link:hover {
+    color: var(--latex-highlight-text); /* Use a highlight color for hover effect */
+}
+
+body.latex-dark .navbar-brand {
+    color: var(--latex-light-text); /* Light text color for the brand */
+}
+    a {
+text-decoration: none; /* Remove underline */
+border: none; /* Remove any border */
+}
+
+/* Ensure the links don't show an outline or border when focused or active */
+a:focus, a:active {
+outline: none; /* Remove outline */
+border: none; /* Remove border */
+}

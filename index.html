@@ -1,21 +1,96 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>My Page</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="tarok/style.css">
+    <title>Nace Sever</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- LaTeX CSS -->
+    <link rel="stylesheet" href="https://latex.vercel.app/style.css">
+    <link rel="stylesheet" href="style.css">
+
 </head>
 <body>
-    <main>
-        <div>
-        <button class="my-button" onclick="window.location.href='tarok/stats.html'">TAROK</button>            
+
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container">
+            <a class="navbar-brand author" href="./index.html">Home</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="./tarok/stats.html">Tarok</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.strava.com/athletes/27671661">Strava</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="./misc.html">Slikce</a>
+                    </li>
+                </ul>
+            </div>
         </div>
-        <div>
-        <button class="my-button" onclick="window.location.href='cycling/index.html'">CYCLING</button>            
+    </nav>
+
+    <!-- Header Section -->
+    <header class="container-fluid text-center">
+        <div class="container">
+            <h1 class="display-4 author" margin-top="1rem" margin-bottom="1rem">Nace Sever</h1>
         </div>
-    </main>
-    <footer>
-    </footer>
+    </header>
+
+    <!-- About Section -->
+    <section class="container-fluid">
+        <div class="container">
+            <div>
+                <p>
+                    Kolesar na cesti in makadamu, kao programer, ljubitelj Italijanske pašte.
+                    Rad potujem, najraje s kolesom, včasih pa me prisilijo, da grem tudi brez.
+                    Kljub vztrajnem prigovarjanju moje sestre ob zanikanju ne znam uporabljat
+                    rodilnik.
+                    O povratno svojilnih zaimkih ali vejicah pa raje sploh ne govorimo.
+                    Lastnik YouTube kanala s triindvajset naročniki, uspešno rešil dva Jane Street puzzla,
+                    odigral več tisoč rund taroka.
+                    Enkrat zmagal na Gozdnem teku, enkrat na makadamkanju po Borovnici, po enkrat
+                    pa prvi na vrhu klanca na Barjanski in Velo rundi.
+                    Moj najljubši klanec je Toško Čelo (5:42), moja najljubša punca pa je Liza.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Picture Section -->
+    <section class="container-fluid mt-5">
+        <div class="container">
+            <div class="row">
+                <img id="randomImage1" class="img-fluid" alt="Random Image 1" style="width: 100%; object-fit: cover;">
+            </div>
+        </div>
+    </section>
+
+    <!-- JavaScript to Randomly Select Images -->
+    <script>
+        // List of image file names for Picture 1 and Picture 2
+        const images1 = ["GOPR0582.JPG"];
+        const images2 = ["photo1.jpg", "photo2.jpg", "photo3.jpg"];
+
+        // Select random images from the lists
+        const randomImage1 = images1[Math.floor(Math.random() * images1.length)];
+
+        // Set the src attributes of the images
+        document.getElementById("randomImage1").src = randomImage1;
+    </script>
+
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
 </body>
 </html>
+
