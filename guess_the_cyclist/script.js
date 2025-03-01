@@ -95,12 +95,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const chatContainer = document.getElementById("chat-container");
     const sendButton = document.getElementById("send-btn");
     const userInput = document.getElementById("user-input");
-    const apiKey = document.getElementById("api-key").value
 
     const instructions = "You are playing a guessing game. The user will ask you questions about a certain " +
     "cyclist and you should respond truthfully and as short as possible. "
 
     let chosenCyclist = ""
+    let apiKey = ""
     let conversation = []
 
 
@@ -163,13 +163,13 @@ document.addEventListener("DOMContentLoaded", () => {
     // Clear chat when clicking difficulty buttons
     document.querySelectorAll(".difficulty-btn").forEach(button => {
         button.addEventListener("click", () => {
-            console.log(chosenCyclist, button.id, firstGame, chatContainer.innerHTML)
+            apiKey = document.getElementById("api-key").value
+
             if (firstGame === false) {
                 chatContainer.innerHTML = "";
             } else {
                 firstGame = false
             }
-            console.log(chosenCyclist, button.id, firstGame, chatContainer.innerHTML)
             chosenCyclist = getRandomCyclist(button.id)
             conversation = [{
                 "role": "system",

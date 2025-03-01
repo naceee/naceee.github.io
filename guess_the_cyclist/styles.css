@@ -7,9 +7,13 @@ body {
     height: 100vh;
     background-color: #343541;
     color: white;
+    padding: 10px;
 }
+
+/* Chat container */
 #chat-container {
-    width: 400px;
+    width: 100%;
+    max-width: 400px;
     height: 500px;
     border-radius: 10px;
     background: #444654;
@@ -20,21 +24,24 @@ body {
     gap: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
+
+/* Messages */
 .message {
     padding: 10px;
     border-radius: 10px;
     max-width: 80%;
     word-wrap: break-word;
 }
+
 .user-message {
     background: #0d6efd;
     align-self: flex-end;
 }
+
 .bot-message {
     background: #4a4b52;
     align-self: flex-start;
 }
-
 
 /* Chat input container */
 #chat-input-container {
@@ -49,7 +56,7 @@ body {
 /* User input field */
 #user-input {
     flex: 1;
-    padding: 10px;
+    padding: 12px;
     border: none;
     border-radius: 20px;
     background: #565869;
@@ -63,8 +70,8 @@ body {
     background: #0d6efd;
     border: none;
     border-radius: 50%;
-    width: 40px;
-    height: 40px;
+    width: 42px;
+    height: 42px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -77,13 +84,14 @@ body {
 }
 
 #send-btn svg {
-    width: 20px;
-    height: 20px;
+    width: 22px;
+    height: 22px;
 }
 
-
+/* API Key input */
 #api-key {
-    width: 400px;
+    width: 100%;
+    max-width: 400px;
     padding: 10px;
     border: none;
     border-radius: 5px;
@@ -92,10 +100,13 @@ body {
     color: white;
 }
 
+/* Difficulty buttons */
 #difficulty-buttons {
     display: flex;
     gap: 10px;
     margin-bottom: 15px;
+    flex-wrap: wrap;
+    justify-content: center;
 }
 
 .difficulty-btn {
@@ -111,4 +122,41 @@ body {
 
 .difficulty-btn:hover {
     background: #6c6f7e;
+}
+
+/* Mobile Responsive Design */
+@media (max-width: 480px) {
+    body {
+        height: auto;
+        justify-content: flex-start;
+    }
+
+    #chat-container {
+        height: 400px;
+    }
+
+    #chat-input-container {
+        max-width: 100%;
+        gap: 5px;
+    }
+
+    #user-input {
+        font-size: 14px;
+        padding: 10px;
+    }
+
+    #send-btn {
+        width: 38px;
+        height: 38px;
+    }
+
+    #difficulty-buttons {
+        flex-direction: row;
+        gap: 5px;
+    }
+
+    .difficulty-btn {
+        font-size: 14px;
+        padding: 8px 12px;
+    }
 }
