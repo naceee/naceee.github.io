@@ -25,7 +25,7 @@ body {
     margin-bottom: 110px;
     gap: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-    padding-bottom: 80px; /* Ensures last messages are visible */
+    padding-bottom: 30px; /* Ensures last messages are visible */
 }
 
 /* Messages */
@@ -148,8 +148,8 @@ input {
     }
 
     #chat-container {
-        height: calc(100vh - 360px);
-        padding-bottom: 80px; /* Extra space for last message visibility */
+        height: calc(100vh - 300px);
+        padding-bottom: 20px;
     }
 
     #chat-input-container {
