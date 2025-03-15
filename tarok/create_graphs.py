@@ -298,8 +298,8 @@ def create_leaderboard():
     #                f'<button class ="my-button" onclick="{link}"> VPIŠI TOČKE </button> \n' \
     #                f'</div>\n'
 
-    with open(f'{DIR}/texts/leaderboard.txt', "w") as f:
-        f.write(table_string)
+    with open(f'{DIR}/texts/leaderboard.txt', "w", encoding="utf-8") as f:
+        f.write(str(table_string))
 
 
 def generate_html(data, min_rounds=400):
