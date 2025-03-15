@@ -14,7 +14,7 @@ DIR = os.path.dirname(os.path.abspath(__file__))
 game_data = pd.read_csv(f'{DIR}/data/games_data_merge_players.csv')
 PLAYERS = list(game_data.columns[1:])
 cmap = matplotlib.colormaps['Set2']
-COLORS = {PLAYERS[i]: f"rgb{(cmap(i)[0], cmap(i)[1], cmap(i)[2])}" for i in range(len(PLAYERS))}
+COLORS = {PLAYERS[i]: f"rgb{(float(cmap(i)[0]), float(cmap(i)[1]), float(cmap(i)[2]))}" for i in range(len(PLAYERS))}
 
 
 def get_update_layout():
