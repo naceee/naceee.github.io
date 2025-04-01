@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nace Sever</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- LaTeX CSS -->
+    <link rel="stylesheet" href="https://latex.vercel.app/style.css">
+    <link rel="stylesheet" href="style_latex.css">
+
+</head>
+<body>
+
+    <!-- Header Section -->
+    <header class="container-fluid text-center">
+        <div class="container">
+            <h1 class="display-4 author" margin-top="1rem" margin-bottom="1rem">Tarok</h1>
+        </div>
+    </header>
+
+<h2>Uvod</h2>
+Tarok je priljubljena in kompleksna igra s kartami, ki zahteva tako strateško razmišljanje, kot tudi dobro sodelovanje
+med igralci. Njena zgodovina sega več stoletij nazaj, danes pa ostaja priljubljena družabna igra med prijatelji.
+V tem delu bomo predstavili analizo igranja taroka med skupino prijateljev, po več tisoč odigranih rundah taroka.
+Najprej bomo dobro definirali pomembne pojme, ki jih bomo pogosto uporabljali. Nato bomo predstavili trenutne rezultate
+v obliki večne lestvice točk in deleža zmag posameznika. Na koncu pa bomo predstavili še igralce, ki v igrah
+sodelujejo in analizirali njihove strategije.
+
+<h2>Definicije</h2>
+<b>Runda</b> taroka je najmanjša osnovna enota taroka, ki jo sestavljajo deljenje kart, licitacija ter igranje.
+Na koncu posamezne runde se igralcem, ki igrajo, prištejejo (oziroma, zadnje čase vse pogosteje, odštejejo) točke.
+<b>Igra</b> taroka je sestavljena iz več zaporednih rund, minimalno 10 in običajno ne več kot 40.
+Na koncu igre se igralcem odštejejo kazni za neporabljene radlce, kdor ima po tem največ točk je <b>zmagovalec</b> igre.
+
+<h2>Večna lestvica</h2>
+Večna lestvica poleg uspešnosti odraža tudi mentalno vzdržljivost in stalno pripravljenost na igro. Ljudje, ki kar
+naprej nekaj delajo in/ali imajo kar naprej neke načrte in so socialni, so tukaj v slabšem položaju. Brezdelneži in
+zabušanti imajo po isti logiki prednost. Najboljše izhodišče za dober položaj na lestvici je entuziazem nad igranjem
+taroka s prijatelji. Na vrhu večne lestvice trenutno kraljuje Peter, ki ima
+37493 točk. Večno lestvico z več podrobnostmi vidimo v tabeli 1.
+
+<p>
+<table class="borders-custom col-1-l col-2-r col-3-r col-4-r col-5-r">
+<tr class="border-bottom-thick"><th>Igralec</th><th>Igre</th><th>Runde</th><th>Točke</th><th>na igro</th></tr>
+<tr><td>Peter</td><td>124</td><td>2919</td><td>37493</td><td>12.8</td></tr>
+<tr><td>Nace</td><td>105</td><td>2474</td><td>35935</td><td>14.5</td></tr>
+<tr><td>Jernej</td><td>127</td><td>3065</td><td>34213</td><td>11.2</td></tr>
+<tr><td>Blaž</td><td>85</td><td>2068</td><td>31333</td><td>15.2</td></tr>
+<tr><td>Gašper</td><td>101</td><td>2461</td><td>28206</td><td>11.5</td></tr>
+<tr><td>Ostali</td><td>10</td><td>298</td><td>3669</td><td>12.3</td></tr>
+<tr><td>Klančar</td><td>12</td><td>233</td><td>3664</td><td>15.7</td></tr>
+<tr><td>Žaži</td><td>20</td><td>398</td><td>1658</td><td>4.2</td></tr>
+<tr><td>Mica</td><td>6</td><td>214</td><td>1173</td><td>5.5</td></tr>
+<tr><td>Kocjančič</td><td>4</td><td>72</td><td>522</td><td>7.2</td></tr>
+<tr><td>Ferjan</td><td>2</td><td>50</td><td>-3531</td><td>-70.6</td></tr>
+
+<caption> To je večna lestvica </caption></table>
+
+</p>
+
+Da pa lahko pravično primerjamo vse igralce in vidimo razvoj ter trende v njihovi igri, je na sliki 1 prikazano
+skupno število točk vsakega igralca glede na število odigranih rund.
+
+<p>
+<figure>
+<img src="graphs/vecna_lestvica.png">
+<figcaption> To je drugačen prikaz večne lestvice </figcaption>
+</figure>
+
+</p>
+
+
+<h2>Število zmag</h2>
+Zadnje čase se je med igralci razširila misel, da so pomembne samo zmage. V tej miselnosti je drugo mesto enakovredno
+tretjemu in četrtemu. Oče in glavni predstavnik te ideologije Jernej Grlj je zaslovel z izjavo, ki ponazarja bistvo te
+filozofije-Grljizma: “Če ne zmagam, zgubim!” Po Grljizmu so v ključnih trenutkih za zmago dovoljena vsa sredstva in vse
+igre, ki bi lahko vodile do edinega cilja. Berači s preveč in solo 3 s premalo taroki, barvni valati s pomanjkanjem
+barvitosti in presežno pisani solo brez-i. Če želi iti nekdo s prednostjo igrati ena, ti v ključnih trenutkih po naukih
+Grljizma ostane le še mučno odločanje med solo 3 in beračem. Če kljub velikemu trudu tako željeni cilj ni dosežen, je
+pravi odziv sprijaznitev z realnostjo, strnjen v še enem slavnem citatu: “Danes pač ni šlo.”
+
+Delež zmag ter ostalih uvrstitev vsakega igralca vidimo na sliki 2. Največji delež zmag ima Peter,
+ki zmaga v kar 29.03 odstotkih iger, ki jih odigra.
+
+<p>
+<figure>
+<img src="graphs/delez_uvrstitev.png">
+<figcaption> Graf prikazuje delež uvrstitev posameznega igralca bla bla bla </figcaption>
+</figure>
+
+</p>
+
+Trende igralcev prav tako lahko opazimo na sliki 3, kjer je prikazano število zmag posameznega igralca skozi čas.
+Tu kraljuje Peter,je zmagal že 69 iger.
+
+<p>
+<figure>
+<img src="graphs/zmage_skozi_cas.png">
+<figcaption> število zmag čez čas </figcaption>
+</figure>
+
+</p>
+
+<h2>Zasedba</h2>
+
+<h3>Peter</h3>
+(falirani) študent kemije, član APZ TT, wikipedist, wannabe pisatelj, amaterski pianist
+
+<h3>Gašper</h3>
+študent fizike, zaposlen na kemijskem inštitutu, plezalec, kolesar, organizator košarke
+
+<h3>Blaž</h3>
+programer, amaterski pianist, organist in pevec ter lastnik discord serverjev
+
+<h3>Nace</h3>
+Študent računalništva in matematike, kolesar, vzdrževalec te spletne strani
+
+<h3>Jernej</h3>
+Študent matematike, zaposlen kot predavatelj na univerzi zraven Los Angelesa, pesnik, kolesar
+
+
+<h2>Literatura</h2>
+
+<ul>
+  <li><a href="https://docs.google.com/spreadsheets/d/1Cv9EgP-gcNYhTOR2O9DxDBdSoSLT0iBg5lDCvBdx51E/edit?gid=0#gid=0">razpredelnica točk</a></li>
+</ul><!-- Bootstrap JS and dependencies -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
+</main>
+<footer>
+
+</footer>
+</body>
+</html>
