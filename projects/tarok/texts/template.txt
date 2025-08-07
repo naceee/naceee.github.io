@@ -1,0 +1,80 @@
+
+<h2>Uvod</h2>
+Tarok je priljubljena in kompleksna igra s kartami, ki zahteva tako strateško razmišljanje, kot tudi dobro sodelovanje
+med igralci. Njena zgodovina sega več stoletij nazaj, danes pa ostaja priljubljena družabna igra med prijatelji.
+V tem delu bomo predstavili analizo igranja taroka med skupino prijateljev, po več tisoč odigranih rundah taroka.
+Najprej bomo dobro definirali pomembne pojme, ki jih bomo pogosto uporabljali. Nato bomo predstavili trenutne rezultate
+v obliki večne lestvice točk in deleža zmag posameznika. Na koncu pa bomo predstavili še igralce, ki v igrah
+sodelujejo in analizirali njihove strategije.
+
+<h2>Definicije</h2>
+<b>Runda</b> taroka je najmanjša osnovna enota taroka, ki jo sestavljajo deljenje kart, licitacija ter igranje.
+Na koncu posamezne runde se igralcem, ki igrajo, prištejejo (oziroma, zadnje čase vse pogosteje, odštejejo) točke.
+<b>Igra</b> taroka je sestavljena iz več zaporednih rund, minimalno 10 in običajno ne več kot 40.
+Na koncu igre se igralcem odštejejo kazni za neporabljene radlce, kdor ima po tem največ točk je <b>zmagovalec</b> igre.
+
+<h2>Večna lestvica</h2>
+Večna lestvica poleg uspešnosti odraža tudi mentalno vzdržljivost in stalno pripravljenost na igro. Ljudje, ki kar
+naprej nekaj delajo in/ali imajo kar naprej neke načrte in so socialni, so tukaj v slabšem položaju. Brezdelneži in
+zabušanti imajo po isti logiki prednost. Najboljše izhodišče za dober položaj na lestvici je entuziazem nad igranjem
+taroka s prijatelji. Na vrhu večne lestvice trenutno kraljuje {DATA:all_time_scores,0,player}, ki ima
+{DATA:all_time_scores,0,value} točk. Večno lestvico z več podrobnostmi vidimo v tabeli 1.
+
+<p>
+{TABLE:leaderboard:To je večna lestvica}
+</p>
+
+Da pa lahko pravično primerjamo vse igralce in vidimo razvoj ter trende v njihovi igri, je na sliki 1 prikazano
+skupno število točk vsakega igralca glede na število odigranih rund.
+
+<p>
+{GRAPH:vecna_lestvica:To je drugačen prikaz večne lestvice}
+</p>
+
+
+<h2>Število zmag</h2>
+Zadnje čase se je med igralci razširila misel, da so pomembne samo zmage. V tej miselnosti je drugo mesto enakovredno
+tretjemu in četrtemu. Oče in glavni predstavnik te ideologije Jernej Grlj je zaslovel z izjavo, ki ponazarja bistvo te
+filozofije-Grljizma: “Če ne zmagam, zgubim!” Po Grljizmu so v ključnih trenutkih za zmago dovoljena vsa sredstva in vse
+igre, ki bi lahko vodile do edinega cilja. Berači s preveč in solo 3 s premalo taroki, barvni valati s pomanjkanjem
+barvitosti in presežno pisani solo brez-i. Če želi iti nekdo s prednostjo igrati ena, ti v ključnih trenutkih po naukih
+Grljizma ostane le še mučno odločanje med solo 3 in beračem. Če kljub velikemu trudu tako željeni cilj ni dosežen, je
+pravi odziv sprijaznitev z realnostjo, strnjen v še enem slavnem citatu: “Danes pač ni šlo.”
+
+Delež zmag ter ostalih uvrstitev vsakega igralca vidimo na sliki 2. Največji delež zmag ima {DATA:win_percentage,0,player},
+ki zmaga v kar {DATA:win_percentage,0,value} odstotkih iger, ki jih odigra.
+
+<p>
+{GRAPH:delez_uvrstitev:Graf prikazuje delež uvrstitev posameznega igralca bla bla bla}
+</p>
+
+Trende igralcev prav tako lahko opazimo na sliki 3, kjer je prikazano število zmag posameznega igralca skozi čas.
+Tu kraljuje {DATA:number_wins,0,player},je zmagal že {DATA:number_wins,0,value} iger.
+
+<p>
+{GRAPH:zmage_skozi_cas:število zmag čez čas}
+</p>
+
+<h2>Zasedba</h2>
+
+<h3>Peter</h3>
+(falirani) študent kemije, član APZ TT, wikipedist, wannabe pisatelj, amaterski pianist
+
+<h3>Gašper</h3>
+študent fizike, zaposlen na kemijskem inštitutu, plezalec, kolesar, organizator košarke
+
+<h3>Blaž</h3>
+programer, amaterski pianist, organist in pevec ter lastnik discord serverjev
+
+<h3>Nace</h3>
+Študent računalništva in matematike, kolesar, vzdrževalec te spletne strani
+
+<h3>Jernej</h3>
+Študent matematike, zaposlen kot predavatelj na univerzi zraven Los Angelesa, pesnik, kolesar
+
+
+<h2>Literatura</h2>
+
+<ul>
+  <li><a href="https://docs.google.com/spreadsheets/d/1Cv9EgP-gcNYhTOR2O9DxDBdSoSLT0iBg5lDCvBdx51E/edit?gid=0#gid=0">razpredelnica točk</a></li>
+</ul>

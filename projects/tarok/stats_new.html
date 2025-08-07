@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<!-- Load d3.js -->
+<script src="https://d3js.org/d3.v6.js"></script>
+
+<!-- Create a div where the graph will take place -->
+<div id="my_dataviz"></div>
+
+
+<script>
+
+// set the dimensions and margins of the graph
+const margin = {top: 50, right: 50, bottom: 50, left: 50},
+    width = 600 - margin.left - margin.right,
+    height = 400 - margin.top - margin.bottom;
+
+// append the svg object to the body of the page
+const svg = d3.select("#my_dataviz")
+    .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", `translate(${margin.left},${margin.top})`);
+
+
+d3.json("https://raw.githubusercontent.com/naceee/naceee.github.io/refs/heads/main/tarok/data/wins_over_time.json").then((data) => {
+    console.log(data);
+    const players = Object.keys(data).map((p) => p.slice(0, -2));
+    console.log(players);
+
+    const lengths = Object.values(data).map((v) => v.length);
+    console.log(lengths);
+
+    const data_plot = Object.values(data).map((v) => v.map((w, l) => [w, l]));
+    console.log(data_plot);
+
+    const text_pos = data_plot.map((v) => [v.length - 1, v[v.length - 1][0]]);
+    console.log(text_pos);
+
+    wins = Object.values(data).map((v) => d3.max(v));
+
+    // x axis
+    const x = d3.scaleLinear()
+        .domain([0, d3.max(lengths)])
+        .range([0, width]);
+    svg.append("g")
+        .attr("transform", `translate(0,${height})`)
+        .call(d3.axisBottom(x));
+
+    // y axis
+    const y = d3.scaleLinear()
+        .domain([0, d3.max(wins)])
+        .range([height, 0]);
+    svg.append("g")
+        .call(d3.axisLeft(y));
+
+    // color scale
+    const color = d3.scaleOrdinal()
+        .domain(players)
+        .range(d3.schemeSet2);
+
+    // Add the lines that are defined with data_plot
+    svg.selectAll("myLines")
+        .data(data_plot)
+        .enter()
+        .append("path")
+        .attr("d", d3.line()
+            .x((d) => x(d[1]))
+            .y((d) => y(d[0]))
+        )
+        .attr("stroke", (d, i) => color(players[i]))
+        .style("stroke-width", 4)
+        .style("fill", "none");
+
+    // Add player names to the end of the lines
+    svg.selectAll("myLabels")
+        .data(text_pos)
+        .enter()
+        .append("text")
+        .attr("transform", (d) => `translate(${x(d[0])},${y(d[1])})`)
+        .attr("x", 12)
+        .text((d, i) => players[i])
+        .style("fill", (d, i) => color(players[i]))
+        .style("font-size", 12);
+    
+
+});
+
+
+
+
+
+
+
+
+
+
+</script>
+
+

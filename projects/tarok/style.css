@@ -1,0 +1,98 @@
+
+button {
+  background-color: #444;
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 18px;
+  margin: 4px 2px;
+  cursor: pointer;
+  font-family: Arial, sans-serif;
+}
+
+.feeling-lucky-button {
+    position: absolute;
+    top: 50%;
+    -ms-transform: translateY(-50%);
+    transform: translateY(-60%);
+    right: 40%;
+}
+
+.next-button {
+  position: absolute;
+  top: 50%;
+  -ms-transform: translateY(-50%);
+  transform: translateY(-50%);
+}
+
+.naslovnica {
+  display: flex;
+  justify-content: left;
+  position: relative;
+  margin-top: 20px;
+}
+
+
+header h1 h2 h3{
+  text-align: center;
+  font-family: Arial, sans-serif;
+  line-height: 1.2;
+}
+
+body{
+  margin: 20px 28% 20px 5%;
+  max-width:65%;
+  line-height:1.6;
+  font-size:18px;
+  font-family: Arial, sans-serif;
+  color:#444;
+  padding: 0 10px;
+  background-color: white;
+  text-align: justify;
+}
+
+iframe{
+  width: 100%;
+  border: none;
+  margin-bottom: 3cm;
+  display:inline-block;
+}
+.table-container {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 23%;
+    height: 100%;
+    background-color: #f0f0f0;
+    padding: 20px;
+    box-sizing: border-box;
+    overflow-y: scroll;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9em;
+    font-family: sans-serif;
+}
+table thead tr {
+    background-color: #6c6c6c;
+    color: #ffffff;
+    text-align: left;
+}
+
+th, td {
+    padding: 4px;
+    border: 0px solid #ccc;
+}
+
+td img{
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: auto;
+    margin-top: auto;
+}
