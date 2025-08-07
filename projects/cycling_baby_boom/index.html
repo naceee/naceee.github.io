@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nace Sever</title>
+    <title>Cycling baby boom</title>
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <!-- LaTeX CSS -->
-    <link rel="stylesheet" href="https://latex.vercel.app/style.css">
-    <link rel="stylesheet" href="css/latex_style.css">
+    <link rel="stylesheet" href="../../css/latex_style.css">
+    <link rel="stylesheet" href="styles.css">
 
 </head>
 <body>
@@ -41,53 +40,35 @@
         </div>
     </nav>
 
+
     <section class="container-fluid">
         <div>
-            <h1 class="author">Nace Sever</h1>
-
+            <h1>Cycling baby boom</h1>
             <p>
-                I am a master student of Computer Science and Mathematics at the University of Ljubljana.
-                I enjoy solving complex problems, analysing and visualizing data and building fun projects.
-            </p>
-
-            <p>
-                In my free time I enjoy being in nature, mostly cycling, hiking and sometimes even running.
-                I love traveling to remote places, sleeping under the stars and swimming in cold rivers.
-            </p>
-
-            <p>
-                Below you can explore some of my projects. Some may be useful, while others are rather silly
-                ideas, that come to my mind when I can't sleep.
+                Have you ever wondered what kind of cyclist would be born if Tadej Pogačar and Primož Roglič had
+                a child together? Well... They are both guys, but what if anyway? Here is a silly project exploring
+                such questions. You can enter two male cyclists (that were active in world tour in 2024) and make
+                a baby. The resulting baby will be an active cyclist with his skill set similar to the average
+                skill set of the two selected cyclists. To make it more fun there is a little bit of randomness
+                involved, so you can try a few times and get even more babies.
             </p>
         </div>
     </section>
 
-    <!-- Projects Section -->
-    <section class="container-fluid">
-      <div class="row">
-        <!-- Project 1 -->
-        <div class="col-md-6 mb-4">
-          <a href="projects/cycling_baby_boom/index.html">
-              <h3>Cycling baby boom</h3>
-          </a>
-          <a href="projects/cycling_baby_boom/index.html">
-            <img src="projects/cycling_baby_boom/title_picture.png" alt="Cycling Baby Boom" class="img-fluid rounded shadow-sm">
-          </a>
-        </div>
-        <!-- Project 2 -->
-        <div class="col-md-6 mb-4">
-          <h3>Project 2</h3>
-          <a href="project2.html">
-            <img src="images/random_image1.jpg" alt="Project 2" class="img-fluid rounded shadow-sm">
-          </a>
-        </div>
-      </div>
-    </section>
+
+    <div class="container-babyboom">
+        <input list="dropdown1-options" id="dropdown1" placeholder="Type your favourite cyclist...">
+        <datalist id="dropdown1-options"></datalist>
+
+        <input list="dropdown2-options" id="dropdown2" placeholder="Type another one...">
+        <datalist id="dropdown2-options"></datalist>
+        <button onclick="handleButtonClick()">Let's make a baby</button>
+        <div id="result"></div>
+        <div id="result-explanaiton"></div>
+    </div>
 
 
-
-
-    <!-- Bootstrap JS and dependencies -->
+    <script src="script.js"></script>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>

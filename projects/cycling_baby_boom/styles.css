@@ -1,21 +1,11 @@
-body {
-    font-family: Arial, sans-serif;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start; /* Changed from center to flex-start */
-    height: 100vh;
-    background-color: #f0f0f0;
-    margin: 0;
-    padding-top: 20px; /* Added padding to push content slightly down */
-}
 
-.container {
-    background: white;
+
+.container-babyboom {
+    background: #eaf7ff;
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    width: 60%;
+    width: 100%;
     max-width: 700px;
     box-sizing: border-box;
     margin-top: 20px; /* Added margin-top to push container slightly down */
@@ -29,12 +19,6 @@ body {
     }
 }
 
-h1 {
-    font-size: 2em;
-    margin-bottom: 10px;
-    color: #333;
-    margin-top: 0; /* Ensure no extra margin at the top */
-}
 
 input, button {
     margin: 10px 0;
@@ -47,14 +31,14 @@ input, button {
 }
 
 button {
-    background-color: #007BFF;
+    background-color: #2b9fff;
     color: white;
     cursor: pointer;
     margin-top: 20px;
 }
 
 button:hover {
-    background-color: #0056b3;
+    background-color: #1b7fd3;
 }
 
 #result {
