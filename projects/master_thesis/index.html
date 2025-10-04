@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>An algorithm for computing the distance to the nondominated area</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- LaTeX CSS -->
+    <link rel="stylesheet" href="https://latex.vercel.app/style.css">
+    <link rel="stylesheet" href="style_latex.css">
+
+</head>
+<body>
+
+    <!-- Header Section -->
+    <header class="container-fluid text-center">
+        <div class="container">
+            <h2 margin-top="1rem" margin-bottom="1rem">An algorithm for computing the distance to the nondominated area</h2>
+        </div>
+    </header>
+
+    <p>
+        In this thesis, we present a new algorithm, ARRNO, for computing the distance to the nondominated area. The distance between a dominated point and the nondominated region is a metric used for ranking dominated solutions in the well-known bi-objective optimization algorithm COMO-CMA-ES. The novelty of ARRNO is that it enables the computation of this distance for points in three or more dimensions, whereas the existing algorithm is limited to sets of two-dimensional points.
+    </p>
+
+    <p>
+        The algorithm is implemented in Python, and its correctness and computational complexity are experimentally evaluated on various sets of nondominated points. For three-dimensional point sets of size n, ARRNO achieves a time complexity of O(nlogn). For constant dimension D >= 4, the time complexity is O(n^(D-1)).
+    </p>
+
+    <p>
+        An implementation of the algorithm for three and four-dimensional point sets is also included in the open-source moarchiving library, which provides efficient storage of nondominated solution sets and computation of indicators in multiobjective optimization. ARRNO thus enables the extension of COMO-CMA-ES to optimization problems with more than two objectives.
+    </p>
+
+    <p>
+        The thesis is available for download on the <a href="https://repozitorij.uni-lj.si/IzpisGradiva.php?id=174024&lang=slv">UL repository</a> and the code is available on my <a href="https://github.com/naceee/master-thesis">github</a>.
+    </p>
+
+    <!-- Bootstrap JS and dependencies -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</main>
+<footer>
+
+</footer>
+</body>
+</html>
