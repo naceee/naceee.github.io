@@ -1,3 +1,1 @@
-# my webpage for fun projects and stuff
-- [cycling baby boom](https://naceee.github.io/cycling)
-- [tarok results visualizations](https://naceee.github.io/tarok/stats.html) 
+This is a repository with some of my [fun projects](https://naceee.github.io) :)
