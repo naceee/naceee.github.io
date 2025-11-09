@@ -21,14 +21,14 @@ taroka s prijatelji. Na vrhu večne lestvice trenutno kraljuje {DATA:all_time_sc
 {DATA:all_time_scores,0,value} točk. Večno lestvico z več podrobnostmi vidimo v tabeli 1.
 
 <p>
-{TABLE:leaderboard:To je večna lestvica}
+{TABLE:leaderboard:Večna lestvica prikazuje število odigranih iger in rund ter skupno število dobljenih točk ter zmag.}
 </p>
 
 Da pa lahko pravično primerjamo vse igralce in vidimo razvoj ter trende v njihovi igri, je na sliki 1 prikazano
 skupno število točk vsakega igralca glede na število odigranih rund.
 
 <p>
-{GRAPH:vecna_lestvica:To je drugačen prikaz večne lestvice}
+{GRAPH:vecna_lestvica:Graf večne lestvice skozi čas prikazuje število točk posameznega igralca, glede na število odigranih rund. Omogoča pravično primerjavo med igralci, ki igrajo manj iger z igralci, ki igrajo vsakič.}
 </p>
 
 
@@ -45,14 +45,14 @@ Delež zmag ter ostalih uvrstitev vsakega igralca vidimo na sliki 2. Največji d
 ki zmaga v kar {DATA:win_percentage,0,value} odstotkih iger, ki jih odigra.
 
 <p>
-{GRAPH:delez_uvrstitev:Graf prikazuje delež uvrstitev posameznega igralca bla bla bla}
+{GRAPH:delez_uvrstitev:Graf prikazuje delež uvrstitev posameznega igralca. }
 </p>
 
 Trende igralcev prav tako lahko opazimo na sliki 3, kjer je prikazano število zmag posameznega igralca skozi čas.
-Tu kraljuje {DATA:number_wins,0,player},je zmagal že {DATA:number_wins,0,value} iger.
+Tu kraljuje {DATA:number_wins,0,player}, ki je zmagal že {DATA:number_wins,0,value} iger.
 
 <p>
-{GRAPH:zmage_skozi_cas:število zmag čez čas}
+{GRAPH:zmage_skozi_cas:Graf prikazuje število zmag posameznega igralca, glede na število odigranih iger. }
 </p>
 
 <h2>Zasedba</h2>

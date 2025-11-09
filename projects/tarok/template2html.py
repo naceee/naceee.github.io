@@ -15,7 +15,10 @@ def prepare_data_dict():
     df_places = pd.read_csv(os.path.join(DIR, 'data/number_of_places.csv'))
     data_dict["win_percentage"] = [{"player": player, "value": df_places[player][0]} for player in df_places.columns]
 
-    data_dict["number_wins"] = [{"player": player, "value": 69} for player, value in zip(players, points)]
+    results = pd.read_csv(os.path.join(DIR, 'data/wins_by_game.csv'))
+    wins = (results == 1).sum(axis=0)
+
+    data_dict["number_wins"] = sorted([{"player": p, "value": v} for p, v in wins.items()], key=lambda x: -x["value"])[:-1]
 
     for key, value in data_dict.items():
         data_dict[key] = sorted(value, key=lambda x: x["value"], reverse=True)
@@ -23,10 +26,10 @@ def prepare_data_dict():
 
 
 def template_to_html():
-    with open(f'{DIR}/texts/header.txt', 'r', encoding='utf-8') as f:
+    with open(f'{DIR}/texts/header.txt', 'r', encoding="utf-8") as f:
         html = f.read()
 
-    with open(f'{DIR}/texts/template.txt', 'r') as f:
+    with open(f'{DIR}/texts/template.txt', 'r', encoding="utf-8") as f:
         template = f.read()
     html = html + template
 
@@ -52,7 +55,7 @@ def template_to_html():
 
         elif m_type == "TABLE":
             # read the full text file
-            with open(f'{DIR}/texts/{m_value}.txt', 'r') as f:
+            with open(f'{DIR}/texts/{m_value}.txt', 'r', encoding="utf-8") as f:
                 text = f.read()
             text = f'<table class="borders-custom col-1-l col-2-r col-3-r col-4-r col-5-r">\n' \
                    f'{text}\n' \
@@ -66,22 +69,21 @@ def template_to_html():
             dict_path = m_value.split(',')
             dd = data_dict.copy()
             for d in dict_path:
-                print(d, dd)
                 try:
                     dd = dd[d]
                 except:
                     dd = dd[int(d)]
 
-
             html = html.replace(f"{{{match}}}", str(dd))
 
+    print(html)
 
-    with open(f'{DIR}/texts/footer.txt', 'r', encoding='utf-8') as f:
+    with open(f'{DIR}/texts/footer.txt', 'r', encoding="utf-8") as f:
         footer = f.read()
     html += footer
 
     # write to file
-    with open(f'{DIR}/index.html', 'w') as f:
+    with open(f'{DIR}/index.html', 'w', encoding="utf-8") as f:
         f.write(html)
 
 
