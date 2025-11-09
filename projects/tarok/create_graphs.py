@@ -11,7 +11,7 @@ game_data = pd.read_csv(f'{DIR}/data/games_data_merge_players.csv')
 COLORMAP = ['#66c2a5','#fc8d62','#8da0cb','#e78ac3','#a6d854','#ffd92f','#e5c494','#b3b3b3']
 PLAYERS = list(game_data.columns[1:])
 COLORS = {player: color for (player, color) in zip(PLAYERS, COLORMAP)}
-MARKERS = {player: dash for (player, dash) in zip(PLAYERS, ["o", "v", "s", "*", "D", "X", "P"])}
+MARKERS = {player: dash for (player, dash) in zip(PLAYERS, ["o", "v", "s", "*", "D", "X", "P", "^"])}
 
 
 POINTS = pd.read_csv(f'{DIR}/data/totals.csv', index_col=0)["points"]

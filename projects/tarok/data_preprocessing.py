@@ -8,7 +8,7 @@ import json
 
 DIR = os.path.dirname(os.path.abspath(__file__))
 
-MERGE_PLAYERS = ["Ostali", "Mica", "Žaži", "Klančar", "Ferjan", "Kocjančič"]
+MERGE_PLAYERS = ["Ostali", "Mica", "Ferjan", "Kocjančič"]
 
 
 def download_as_csv():
