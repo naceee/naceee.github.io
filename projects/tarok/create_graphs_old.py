@@ -286,11 +286,11 @@ def create_leaderboard():
 
     link = "window.location.href='https://docs.google.com/spreadsheets/d/1Cv9EgP-gcNYhTOR2O9DxDBdSoSLT0iBg5lDCvBdx51E/edit?usp=sharing'"
     table_string = '<div>\n<table id="central_table">\n<thead><tr><th>' \
-                   'Igralec</th><th>Igre</th><th>Runde</th><th>Točke</th><th>na igro</th></tr></thead>\n'
+                   'Igralec</th><th>Igre</th><th>Runde</th><th>Točke</th><th>Zmage</th></tr></thead>\n'
     for player, row in data.iterrows():
         table_string += f'<tr><td>{player}</td><td>{int(row["games"])}</td>' \
                         f'<td>{int(row["rounds"])}</td><td>{int(row["points"])}</td>' \
-                        f'<td>{round(row["points_per_round"], 1)}</td></tr>\n'
+                        f'<td>{round(row["wins"], 1)}</td></tr>\n'
     table_string += '</table>\n</div>'
 
     #table_string += f'</table>\n<br>\n' \

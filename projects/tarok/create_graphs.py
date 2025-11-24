@@ -117,11 +117,11 @@ def wins_over_time():
 
 def create_leaderboard():
     data = pd.read_csv(f'{DIR}/data/totals.csv', index_col=0)
-    table_string = '<tr class="border-bottom-thick"><th>Igralec</th><th>Igre</th><th>Runde</th><th>Točke</th><th>na igro</th></tr>\n'
+    table_string = '<tr class="border-bottom-thick"><th>Igralec</th><th>Igre</th><th>Runde</th><th>Točke</th><th>Zmage</th></tr>\n'
     for player, row in data.iterrows():
         table_string += f'<tr><td>{player}</td><td>{int(row["games"])}</td>' \
                         f'<td>{int(row["rounds"])}</td><td>{int(row["points"])}</td>' \
-                        f'<td>{round(row["points_per_round"], 1)}</td></tr>\n'
+                        f'<td>{round(row["wins"], 1)}</td></tr>\n'
 
     with open(f'{DIR}/texts/leaderboard.txt', "w", encoding="utf-8") as f:
         f.write(table_string)

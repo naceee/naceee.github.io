@@ -59,6 +59,28 @@ def wins_by_game_df():
     data.to_csv(f'{DIR}/data/wins_by_game.csv', index=False)
 
 
+def wins_by_game_df_all():
+    data = pd.read_csv(f'{DIR}/data/leaderboard_data.csv')
+    games = data["st_iger"]
+    data = data.drop(columns=["st_iger"])
+    data = data.fillna(-np.inf)
+
+    def f(row):
+        # get the 4 largest values and their indices and make sure the numbers are bigger than 0
+
+        x = nlargest(4, enumerate(row.to_list()), key=lambda y: y[1])
+        x = [(i, j) for i, j in x if j > -np.inf]
+        for i in range(len(x)):
+            row[x[i][0]] = i + 1
+
+    data.apply(f, axis=1)
+    data = data.replace(-np.inf, np.nan)
+    data["st_iger"] = games
+
+    # save the dataframe
+    data.to_csv(f'{DIR}/data/wins_by_game_all.csv', index=False)
+
+
 def last_games_by_one_df(n=200):
     data = pd.read_csv(f'{DIR}/data/games_data_merge_players.csv')
     PLAYERS = data.columns[1:]
@@ -215,11 +237,14 @@ def leaderboard_df():
     num_games = data.sum()
     num_rounds = data.multiply(game_lengths, axis=0).sum()
 
+    wins = pd.read_csv(f'{DIR}/data/wins_by_game_all.csv')
+    wins = wins[wins == 1.0].sum(axis=0)
+    wins = wins[players]
+
     # combine points_per_player, num_games and num_round into a dataframe
-    df = pd.DataFrame({"points": points_per_player, "games": num_games, "rounds": num_rounds})
+    df = pd.DataFrame({"points": points_per_player, "games": num_games, "rounds": num_rounds, "wins": wins})
     # cast to int
     df = df.astype(int)
-    df["points_per_round"] = df["points"] / df["rounds"]
 
     # sort players by points
     sort_idx = np.argsort(points_per_player)[::-1]
@@ -234,6 +259,7 @@ def save_all():
     players = csv_to_df(merge_players=True)
     all_players = csv_to_df(merge_players=False)
     wins_by_game_df()
+    wins_by_game_df_all()
     last_games_by_one_df()
     leaderboard_cumsum_df(players)
     number_of_places_df(players)
