@@ -2,50 +2,62 @@ import numpy as np
 import pandas as pd
 
 
-def multiplayer_elo_from_rankings(df, K=32, initial_elo=1500):
+def multiplayer_elo(
+    rank_df, points_df, number_of_games, K=32, tau=128, initial_elo=1500
+):
     """
-    df: DataFrame with ranks (1=best, 4=worst), NaN for non-participants
-    returns: DataFrame of Elo ratings after each game
+    Multiplayer Elo with logistic point-difference outcomes.
+
+    rank_df   : DataFrame with ranks (1=best, 4=worst, NaN if not played)
+    points_df : DataFrame with point scores (same shape as rank_df)
+    K         : Elo update factor
+    tau       : score difference scale (larger = softer)
     """
 
-    players = df.columns
+    players = rank_df.columns
     elo = pd.Series(initial_elo, index=players, dtype=float)
-
     elo_history = []
 
-    for _, row in df.iterrows():
-        # Copy previous ratings
+    for idx, rank_row in rank_df.iterrows():
         new_elo = elo.copy()
 
-        # Players in this game
-        active = row.dropna()
-        active_players = active.index
-        ranks = active.values
+        # Active players
+        active = rank_row.dropna().index
+        scores = points_df.loc[idx, active]
 
-        # Actual scores from ranks
-        actual = (4 - ranks) / 3.0
-        actual = pd.Series(actual, index=active_players)
-
-        # Expected scores
+        # Expected & actual scores
+        actual = {}
         expected = {}
-        for i in active_players:
+
+        for i in active:
             Ri = elo[i]
-            probs = []
-            for j in active_players:
+            ai_sum = 0.0
+            ei_sum = 0.0
+
+            for j in active:
                 if i == j:
                     continue
+
                 Rj = elo[j]
-                p = 1 / (1 + 10 ** ((Rj - Ri) / 400))
-                probs.append(p)
-            expected[i] = np.mean(probs)
 
-        expected = pd.Series(expected)
+                # Logistic actual outcome from points
+                d = scores[i] - scores[j]
+                a_ij = 1.0 / (1.0 + np.exp(-d / tau))
 
-        # Elo update
-        for i in active_players:
-            new_elo[i] += K * (actual[i] - expected[i])
+                # Elo expected outcome
+                e_ij = 1.0 / (1.0 + 10 ** ((Rj - Ri) / 400))
 
-        # Save state
+                ai_sum += a_ij
+                ei_sum += e_ij
+
+            actual[i] = ai_sum / (len(active) - 1)
+            expected[i] = ei_sum / (len(active) - 1)
+
+        # Update Elo
+        K_multiplier = number_of_games[idx] / 30
+        for i in active:
+            new_elo[i] += K * K_multiplier * (actual[i] - expected[i])
+
         elo = new_elo
         elo_history.append(elo.copy())
 

@@ -5,7 +5,7 @@ from heapq import nlargest
 import numpy as np
 import pandas as pd
 import requests
-from ranking import multiplayer_elo_from_rankings
+from ranking import multiplayer_elo
 
 DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -266,9 +266,10 @@ def leaderboard_df():
 
 
 def update_ratings(players):
-    data = pd.read_csv(f"{DIR}/data/wins_by_game.csv")
-    data = data[players]
-    elo_df = multiplayer_elo_from_rankings(data[players], K=32, initial_elo=1500)
+    rank_df = pd.read_csv(f"{DIR}/data/wins_by_game.csv")
+    points_df = pd.read_csv(f"{DIR}/data/games_data_merge_players.csv")
+    n_games = list(points_df["st_iger"])
+    elo_df = multiplayer_elo(rank_df[players], points_df[players], n_games)
     elo_df.to_csv(f"{DIR}/data/elo_ratings.csv", index=False)
 
 
