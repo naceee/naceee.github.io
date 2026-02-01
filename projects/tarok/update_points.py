@@ -1,7 +1,8 @@
-from template2html import template_to_html
+import time
+
 from create_graphs import update_all
 from data_preprocessing import save_all
-import time
+from template2html import template_to_html
 
 
 def main():
@@ -12,5 +13,5 @@ def main():
     template_to_html()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

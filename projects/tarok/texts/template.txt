@@ -55,6 +55,14 @@ Tu kraljuje {DATA:number_wins,0,player}, ki je zmagal že {DATA:number_wins,0,va
 {GRAPH:zmage_skozi_cas:Graf prikazuje število zmag posameznega igralca, glede na število odigranih iger. }
 </p>
 
+Da lahko spremljamo, kako so se razmerja moči spreminjala skozi čas razvijemo tudi sistem rangiranja igralcev, ki temelji
+na Plackett–Luce-ovem modelu rangiranja večigralskih iger. Vsak igralec ima določeno oceno, ki se skozi čas spreminja 
+glede na njegove rezultate.
+<p>
+{GRAPH:elo_ratings:Graf prikazuje spremembe Elo ocene igralcev skozi čas. }
+</p>
+
+
 <h2>Zasedba</h2>
 
 <h3>Peter</h3>
