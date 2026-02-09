@@ -302,6 +302,9 @@ function createClimbDetailPlots(climbs) {
     }
 
     climbs.forEach((climb, index) => {
+        // Calculate max 100m gradient
+        const max100mGradient = calculateMax100mGradient(climb);
+        
         // Create container for this climb
         const climbDiv = document.createElement('div');
         climbDiv.className = 'climb-detail';
@@ -315,6 +318,7 @@ function createClimbDetailPlots(climbs) {
                 <span><strong>Length:</strong> ${climb.length} km</span>
                 <span><strong>Elevation Gain:</strong> ${Math.round(climb.elevationGain)} m</span>
                 <span><strong>Avg Gradient:</strong> ${climb.gradient}%</span>
+                <span><strong>Max Gradient:</strong> ${max100mGradient.toFixed(1)}%</span>
                 <span><strong>Distance to go:</strong> ${climb.toGo} km</span>
             </div>
         `;
@@ -328,134 +332,355 @@ function createClimbDetailPlots(climbs) {
 
         climbDetailsContainer.appendChild(climbDiv);
 
-        // Calculate kilometer-by-kilometer stats
-        const kmData = calculateKmByKmStats(climb);
-
-        // Create color-coded segments based on gradient
-        const traces = createGradientColoredTraces(climb, kmData);
+        // Create color-coded segments based on adaptive gradient analysis
+        const segments = calculateAdaptiveSegments(climb);
+        const traces = createGradientColoredTracesWithLabels(climb, segments, plotDiv.id);
 
         // Find min and max elevation for y-axis range
         const minElev = Math.min(...climb.elevation);
         const maxElev = Math.max(...climb.elevation);
+        const yRangePadding = Math.min(100, (maxElev - minElev) * 0.1); // Add 10% padding or at least 100m
 
         const layout = {
-            title: `Kilometer-by-Kilometer Analysis`,
+            title: '',
             xaxis: { 
-                title: 'Distance from start of climb (km)',
-                gridcolor: '#e0e0e0'
+                title: '',
+                showgrid: false,
+                showticklabels: false,
+                zeroline: false
             },
             yaxis: { 
-                title: 'Elevation (m)',
-                gridcolor: '#e0e0e0',
-                range: [minElev - 100, maxElev + 100]
+                title: '',
+                showgrid: false,
+                showticklabels: false,
+                zeroline: false,
+                range: [minElev - yRangePadding, maxElev + yRangePadding]
             },
             hovermode: 'x unified',
-            showlegend: true,
-            legend: { x: 0.01, y: 0.99 },
-            margin: { t: 50, b: 50, l: 60, r: 60 }
+            showlegend: false,
+            margin: { t: 20, b: 20, l: 20, r: 20 },
+            plot_bgcolor: 'white',
+            paper_bgcolor: 'white'
         };
 
         Plotly.newPlot(plotDiv.id, traces, layout, {responsive: true});
+        
+        // Add segment labels as annotations after plot is created
+        addSegmentLabels(plotDiv.id, segments, climb);
     });
 }
 
 
-function createGradientColoredTraces(climb, kmData) {
+function calculateMax100mGradient(climb) {
+    let maxGradient = 0;
+    const targetDistance = 0.15; // 150m in km
+    
+    for (let i = 0; i < climb.climbDistance.length - 1; i++) {
+        // Find the point approximately 100m ahead
+        for (let j = i + 1; j < climb.climbDistance.length; j++) {
+            const dist = climb.climbDistance[j] - climb.climbDistance[i];
+            
+            if (dist >= targetDistance * 0.8) {
+                const elevDiff = climb.elevation[j] - climb.elevation[i];
+                const gradient = (elevDiff / (dist * 10));
+                maxGradient = Math.max(maxGradient, gradient);
+                break;
+            }
+            
+            if (dist > targetDistance * 1.1) break;
+        }
+    }
+    
+    return maxGradient;
+}
+
+
+function createGradientColoredTracesWithLabels(climb, segments, plotId) {
     const traces = [];
     
-    // Function to determine color based on gradient
+    // Function to get color from continuous colormap based on gradient
+    // Using a perceptually uniform colormap: light blue -> cyan -> green -> yellow -> orange -> red -> dark red
     function getGradientColor(gradient) {
-        if (gradient >= 15) return { color: 'rgba(0, 0, 0, 0.6)', name: 'Insane (≥15%)' }; // Black
-        if (gradient >= 10) return { color: 'rgba(255, 0, 0, 0.6)', name: 'Very Hard (10-15%)' }; // Red
-        if (gradient >= 7) return { color: 'rgba(255, 255, 0, 0.6)', name: 'Hard (7-10%)' }; // Yellow
-        if (gradient >= 4) return { color: 'rgba(0, 200, 0, 0.6)', name: 'Moderate (4-7%)' }; // Green
-        return { color: 'rgba(0, 150, 255, 0.6)', name: 'Easy (<4%)' }; // Blue
+        // Clamp gradient between 0 and 20% for color mapping
+        const clampedGradient = Math.max(0, Math.min(20, gradient));
+        const ratio = clampedGradient / 20;
+        
+        let r, g, b;
+        
+        if (ratio < 0.2) { // 0-4%: Light blue to cyan
+            const t = ratio / 0.2;
+            r = Math.round(173 + (64 - 173) * t);
+            g = Math.round(216 + (224 - 216) * t);
+            b = Math.round(230 + (208 - 230) * t);
+        } else if (ratio < 0.35) { // 4-7%: Cyan to green
+            const t = (ratio - 0.2) / 0.15;
+            r = Math.round(64 + (72 - 64) * t);
+            g = Math.round(224 + (209 - 224) * t);
+            b = Math.round(208 + (107 - 208) * t);
+        } else if (ratio < 0.5) { // 7-10%: Green to yellow
+            const t = (ratio - 0.35) / 0.15;
+            r = Math.round(72 + (254 - 72) * t);
+            g = Math.round(209 + (224 - 209) * t);
+            b = Math.round(107 + (84 - 107) * t);
+        } else if (ratio < 0.7) { // 10-14%: Yellow to orange
+            const t = (ratio - 0.5) / 0.2;
+            r = Math.round(254 + (252 - 254) * t);
+            g = Math.round(224 + (141 - 224) * t);
+            b = Math.round(84 + (58 - 84) * t);
+        } else if (ratio < 0.85) { // 14-17%: Orange to red
+            const t = (ratio - 0.7) / 0.15;
+            r = Math.round(252 + (239 - 252) * t);
+            g = Math.round(141 + (68 - 141) * t);
+            b = Math.round(58 + (68 - 58) * t);
+        } else { // 17-20%: Red to dark red
+            const t = (ratio - 0.85) / 0.15;
+            r = Math.round(239 + (165 - 239) * t);
+            g = Math.round(68 + (0 - 68) * t);
+            b = Math.round(68 + (38 - 68) * t);
+        }
+        
+        return `rgba(${r}, ${g}, ${b}, 0.8)`;
     }
 
-    // Create segments for each kilometer
-    for (let i = 0; i < kmData.positions.length; i++) {
-        const km = Math.round(kmData.positions[i] - 0.5);
+    // Create traces for each segment with borders
+    segments.forEach((segment, idx) => {
+        const color = getGradientColor(segment.gradient);
         
-        // Find the index range for this kilometer segment
-        let startIdx = 0;
-        let endIdx = climb.climbDistance.length - 1;
+        // Main filled area for the segment
+        traces.push({
+            x: segment.distances,
+            y: segment.elevations,
+            mode: 'lines',
+            type: 'scatter',
+            line: { color: 'transparent', width: 0 },
+            fill: 'tozeroy',
+            fillcolor: color,
+            name: `Segment ${idx + 1}`,
+            showlegend: false,
+            hovertemplate: `Distance: %{x:.2f} km<br>Elevation: %{y:.0f} m<br>Gradient: ${segment.gradient.toFixed(1)}%<extra></extra>`
+        });
         
-        for (let j = 0; j < climb.climbDistance.length; j++) {
-            if (Math.abs(climb.climbDistance[j] - km) < Math.abs(climb.climbDistance[startIdx] - km)) {
-                startIdx = j;
-            }
-        }
+        // Top border (thick black line)
+        traces.push({
+            x: segment.distances,
+            y: segment.elevations,
+            mode: 'lines',
+            type: 'scatter',
+            line: { color: 'black', width: 3 },
+            showlegend: false,
+            hoverinfo: 'skip'
+        });
         
-        for (let j = 0; j < climb.climbDistance.length; j++) {
-            if (Math.abs(climb.climbDistance[j] - (km + 1)) < Math.abs(climb.climbDistance[endIdx] - (km + 1))) {
-                endIdx = j;
-            }
-        }
-
-        if (endIdx > startIdx) {
-            const gradient = kmData.gradients[i];
-            const colorInfo = getGradientColor(gradient);
-            
+        // Vertical separator at the end of segment (thin black line)
+        if (idx < segments.length - 1) {
+            const lastX = segment.distances[segment.distances.length - 1];
+            const lastY = segment.elevations[segment.elevations.length - 1];
             traces.push({
-                x: climb.climbDistance.slice(startIdx, endIdx + 1),
-                y: climb.elevation.slice(startIdx, endIdx + 1),
+                x: [lastX, lastX],
+                y: [0, lastY],
                 mode: 'lines',
                 type: 'scatter',
-                line: { color: 'transparent', width: 0 },
-                fill: 'tozeroy',
-                fillcolor: colorInfo.color,
-                name: `${colorInfo.name}`,
-                showlegend: i === 0 || 
-                    (i > 0 && getGradientColor(kmData.gradients[i-1]).name !== colorInfo.name),
-                legendgroup: colorInfo.name,
-                hovertemplate: `Distance: %{x:.2f} km<br>Elevation: %{y:.0f} m<br>Gradient: ${gradient}%<extra></extra>`
+                line: { color: 'black', width: 1.5 },
+                showlegend: false,
+                hoverinfo: 'skip'
             });
         }
-    }
+    });
 
     return traces;
 }
 
 
-function calculateKmByKmStats(climb) {
-    const positions = [];
-    const gradients = [];
-    const elevations = [];
+function addSegmentLabels(plotId, segments, climb) {
+    // Wait a bit for the plot to render
+    setTimeout(() => {
+        const plotDiv = document.getElementById(plotId);
+        if (!plotDiv || !plotDiv.layout) return;
+        
+        const annotations = [];
+        
+        // Segment labels at the bottom
+        segments.forEach((segment, idx) => {
+            // Find middle point of segment
+            const midIdx = Math.floor(segment.distances.length / 2);
+            const x = segment.distances[midIdx];
 
-    // For each kilometer mark
-    for (let km = 1; km <= Math.ceil(climb.length); km++) {
-        const targetDist = km;
-        
-        // Find the index range for this kilometer
-        let startIdx = 0;
-        let endIdx = climb.climbDistance.length - 1;
-        
-        // Find closest point to (km-1)
-        for (let i = 0; i < climb.climbDistance.length; i++) {
-            if (Math.abs(climb.climbDistance[i] - (km - 1)) < Math.abs(climb.climbDistance[startIdx] - (km - 1))) {
-                startIdx = i;
-            }
-        }
-        
-        // Find closest point to km
-        for (let i = 0; i < climb.climbDistance.length; i++) {
-            if (Math.abs(climb.climbDistance[i] - km) < Math.abs(climb.climbDistance[endIdx] - km)) {
-                endIdx = i;
-            }
-        }
-
-        if (endIdx > startIdx) {
-            const distDiff = climb.climbDistance[endIdx] - climb.climbDistance[startIdx];
-            const elevDiff = climb.elevation[endIdx] - climb.elevation[startIdx];
-            const gradient = distDiff > 0 ? (elevDiff / (distDiff * 10)) : 0;
+            const segmentStart = segment.distances[0];
+            const segmentMid = segmentStart + segment.length / 2;
+            // Format the label
+            const lengthKm = (segment.length).toFixed(1);
+            const gradientText = segment.gradient.toFixed(1);
+            const label = `${lengthKm}km<br>${gradientText}%`;
             
-            positions.push(km - 0.5); // Middle of the km
-            gradients.push(parseFloat(gradient.toFixed(2)));
-            elevations.push(Math.round(climb.elevation[endIdx]));
+            annotations.push({
+                x: segmentMid,
+                y: 0,
+                yref: 'paper',
+                xref: 'x',
+                xanchor: 'center',
+                text: label,
+                showarrow: false,
+                font: {
+                    size: 11,
+                    color: 'black',
+                    family: 'Arial, sans-serif',
+                    weight: 'bold'
+                },
+                bgcolor: 'rgba(255, 255, 255, 0.7)',
+                borderpad: 3,
+                borderwidth: 0
+            });
+        });
+
+        xMargin = (climb.climbDistance[climb.climbDistance.length - 1] - climb.climbDistance[0]) * 0.005;
+
+        // Start elevation annotation
+        const startElev = Math.round(climb.elevation[0]);
+        annotations.push({
+            x: -xMargin, // Slightly to the left of the start
+            y: climb.elevation[0], // Position above the start point
+            xanchor: 'right',
+            xref: 'x',
+            yref: 'y',
+            text: `${startElev}m`,
+            showarrow: false,
+            // arrowhead: 2,
+            // arrowsize: 1,
+            // arrowwidth: 2,
+            arrowcolor: 'black',
+            font: {
+                size: 16,
+                color: 'black',
+                family: 'Arial, sans-serif',
+                weight: 'bold'
+            },
+            // bgcolor: 'rgba(255, 255, 255, 0.9)',
+            // borderpad: 3,
+            // borderwidth: 1,
+            // bordercolor: 'black'
+        });
+        
+        // End elevation annotation
+        const endElev = Math.round(climb.elevation[climb.elevation.length - 1]);
+        annotations.push({
+            x: climb.climbDistance[climb.climbDistance.length - 1] + xMargin, // Slightly to the right of the end
+            y: climb.elevation[climb.elevation.length - 1],
+            xanchor: 'left',
+            xref: 'x',
+            yref: 'y',
+            text: `${endElev}m`,
+            showarrow: false,
+            arrowcolor: 'black',
+            font: {
+                size: 16,
+                color: 'black',
+                family: 'Arial, sans-serif',
+                weight: 'bold'
+            },
+            // bgcolor: 'rgba(255, 255, 255, 0.9)',
+            // borderpad: 3,
+            // borderwidth: 1,
+            // bordercolor: 'black'
+        });
+        
+        Plotly.relayout(plotId, { annotations: annotations });
+    }, 100);
+}
+
+
+function calculateAdaptiveSegments(climb) {
+    const segments = [];
+    const minSegmentLength = 0.1; // Minimum 100m segment
+    const gradientTolerance = 1.5; // Allow 1.5% variation within a segment
+    
+    let i = 0;
+    
+    while (i < climb.climbDistance.length - 1) {
+        let segmentStart = i;
+        let segmentEnd = i + 1;
+        
+        // Find a reasonable initial window (at least 100m or 10 points)
+        while (segmentEnd < climb.climbDistance.length && 
+               (climb.climbDistance[segmentEnd] - climb.climbDistance[segmentStart] < minSegmentLength ||
+                segmentEnd - segmentStart < 10)) {
+            segmentEnd++;
+        }
+        
+        if (segmentEnd >= climb.climbDistance.length) {
+            segmentEnd = climb.climbDistance.length - 1;
+        }
+        
+        // Calculate initial gradient for this segment
+        let segmentDist = climb.climbDistance[segmentEnd] - climb.climbDistance[segmentStart];
+        let segmentElev = climb.elevation[segmentEnd] - climb.elevation[segmentStart];
+        let currentGradient = segmentDist > 0 ? (segmentElev / (segmentDist * 10)) : 0;
+        
+        // Extend the segment while gradient remains similar
+        let extendedEnd = segmentEnd;
+        while (extendedEnd < climb.climbDistance.length - 1) {
+            let testEnd = extendedEnd + 1;
+            
+            // Calculate gradient if we extend to testEnd
+            let testDist = climb.climbDistance[testEnd] - climb.climbDistance[segmentStart];
+            let testElev = climb.elevation[testEnd] - climb.elevation[segmentStart];
+            let testGradient = testDist > 0 ? (testElev / (testDist * 10)) : 0;
+            
+            // Also check the gradient of just the extension part
+            let extDist = climb.climbDistance[testEnd] - climb.climbDistance[extendedEnd];
+            let extElev = climb.elevation[testEnd] - climb.elevation[extendedEnd];
+            let extGradient = extDist > 0 ? (extElev / (extDist * 10)) : 0;
+            
+            // Check if gradients are similar (within tolerance)
+            // And if the extension gradient doesn't differ too much from current
+            if (Math.abs(testGradient - currentGradient) <= gradientTolerance &&
+                Math.abs(extGradient - currentGradient) <= gradientTolerance * 1.5) {
+                extendedEnd = testEnd;
+                currentGradient = testGradient; // Update to the new average
+            } else {
+                break;
+            }
+        }
+        
+        // Create the segment
+        segments.push({
+            distances: climb.climbDistance.slice(segmentStart, extendedEnd + 1),
+            elevations: climb.elevation.slice(segmentStart, extendedEnd + 1),
+            gradient: currentGradient,
+            length: climb.climbDistance[extendedEnd] - climb.climbDistance[segmentStart]
+        });
+        
+        // Move to next segment
+        i = extendedEnd;
+    }
+    
+    // Post-process: merge very short segments with similar gradients
+    let merged = [];
+    for (let j = 0; j < segments.length; j++) {
+        if (merged.length === 0) {
+            merged.push(segments[j]);
+        } else {
+            let lastSeg = merged[merged.length - 1];
+            let currentSeg = segments[j];
+            
+            // If current segment is very short and gradient is similar to previous
+            if (currentSeg.length < minSegmentLength * 2 && 
+                Math.abs(currentSeg.gradient - lastSeg.gradient) <= gradientTolerance) {
+                // Merge with previous segment
+                lastSeg.distances = lastSeg.distances.concat(currentSeg.distances.slice(1));
+                lastSeg.elevations = lastSeg.elevations.concat(currentSeg.elevations.slice(1));
+                lastSeg.length = lastSeg.distances[lastSeg.distances.length - 1] - lastSeg.distances[0];
+                
+                // Recalculate gradient
+                let totalDist = lastSeg.length;
+                let totalElev = lastSeg.elevations[lastSeg.elevations.length - 1] - lastSeg.elevations[0];
+                lastSeg.gradient = totalDist > 0 ? (totalElev / (totalDist * 10)) : 0;
+            } else {
+                merged.push(currentSeg);
+            }
         }
     }
-
-    return { positions, gradients, elevations };
+    
+    return merged;
 }
 
 
