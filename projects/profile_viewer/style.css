@@ -56,3 +56,47 @@ input[type="file"] {
   border-radius: 8px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
+
+#climb-details {
+  max-width: 1200px;
+  margin: 40px auto;
+}
+
+.climb-detail {
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 30px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.climb-header {
+  margin-bottom: 20px;
+}
+
+.climb-header h3 {
+  color: #333;
+  margin: 0 0 10px 0;
+  font-size: 1.5em;
+}
+
+.climb-stats {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  color: #666;
+  font-size: 0.95em;
+}
+
+.climb-stats span {
+  padding: 5px 10px;
+  background: #f5f5f5;
+  border-radius: 4px;
+}
+
+.climb-plot {
+  width: 100%;
+  height: 400px;
+  margin: 20px 0;
+}
