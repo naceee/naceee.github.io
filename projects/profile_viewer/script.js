@@ -598,19 +598,14 @@ function updateMainPlotAnnotation(climbIndex, climb) {
     let addIdx = 0;
     const annotations = plotDiv.layout.annotations;
     for (let i = 0; i < climbIndex; i++) {
-        if (annotations[i].text.split('<br>').length === 1) {
+        if (annotations[i].text.split('<br>').length === 2) {
             addIdx++;
         }
     }
 
     if (climbIndex < annotations.length) {
         // Update the annotation text with the new name
-        let text;
-        if (climb.category === 'hupser' || climb.category === 'uncategorized') {
-            text = `${climb.length}km<br>${climb.gradient}%`;
-        } else {
-            text = `${climb.name}<br>${climb.length}km<br>${climb.gradient}%`;
-        }
+        let text = `${climb.name}<br>${climb.length}km<br>${climb.gradient}%`;
 
         annotations[climbIndex + addIdx].text = text;
 
