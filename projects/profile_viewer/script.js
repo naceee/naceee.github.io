@@ -597,9 +597,12 @@ function updateMainPlotAnnotation(climbIndex, climb) {
     // The annotations are in the same order as the climbs, but ignore hupser and uncategorized climbs
     let addIdx = 0;
     const annotations = plotDiv.layout.annotations;
-    for (let i = 0; i < climbIndex; i++) {
-        if (annotations[i].text.split('<br>').length === 2) {
+    let k = 0;
+    while (k < climbIndex && k + addIdx < annotations.length) {
+        if (annotations[k].text.split('<br>').length === 2) {
             addIdx++;
+        } else {
+            k++;
         }
     }
 
