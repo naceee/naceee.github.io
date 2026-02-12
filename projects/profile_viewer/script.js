@@ -598,12 +598,11 @@ function updateMainPlotAnnotation(climbIndex, climb) {
     let addIdx = 0;
     const annotations = plotDiv.layout.annotations;
     let k = 0;
-    while (k < climbIndex && k + addIdx < annotations.length) {
+    while (k < climbIndex + addIdx && climbIndex + addIdx < annotations.length) {
         if (annotations[k].text.split('<br>').length === 2) {
             addIdx++;
-        } else {
-            k++;
-        }
+        } 
+        k++;
     }
 
     if (climbIndex < annotations.length) {
