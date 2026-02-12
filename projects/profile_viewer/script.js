@@ -38,10 +38,15 @@ document.getElementById('fileInput').addEventListener('change', function (event)
         let topDist = climb.distance[topIndex];
         let topElev = climb.elevation[topIndex];
 
+        if (climb.category === 'hupser' || climb.category === 'uncategorized') {
+            text = `${climb.length}km<br>${climb.gradient}%`;
+        } else {
+            text = `${climb.name}<br>${climb.length}km<br>${climb.gradient}%`;
+        }
         return {
             x: topDist,
             y: topElev,
-            text: `${climb.length}km<br>${climb.gradient}%`,
+            text: text,
             showarrow: true,
             arrowhead: 2,
             ax: 0,
@@ -53,37 +58,60 @@ document.getElementById('fileInput').addEventListener('change', function (event)
         };
     });
 
+    const ylim_min = Math.min(...ele) - 50;
+    const ylim_max = Math.max(...ele) + 150;
+
     // Create traces for the main plot
     let traces = [{
+        x: dist,
+        y: Array(dist.length).fill(ylim_min),
+        mode: 'lines',
+        type: 'scatter',
+        line: { color: 'green' },
+        showlegend: false
+    }];
+
+    traces.push({
         x: dist,
         y: ele,
         mode: 'lines',
         type: 'scatter',
         line: { color: 'green' },
-        fill: 'tozeroy',
+        fill: 'tonexty',
         fillcolor: 'rgba(0, 128, 0, 0.3)',
-        name: 'Elevation'
-    }];
+        name: 'Elevation',
+        showlegend: false
+    });
 
     // Add shaded regions for each climb (all same dark green color)
     climbs.forEach((climb, index) => {
+        traces.push({
+            x: climb.distance,
+            y: Array(climb.distance.length).fill(ylim_min),
+            mode: 'lines',
+            type: 'scatter',
+            line: { color: 'green' },
+            showlegend: false
+        });
+
         traces.push({
             x: climb.distance,
             y: climb.elevation,
             mode: 'lines',
             type: 'scatter',
             line: { color: 'transparent' },
-            fill: 'tozeroy',
+            fill: 'tonexty',
             fillcolor: 'rgba(0, 100, 0, 0.3)',
             name: `Climb ${index + 1}: ${climb.length}km @ ${climb.gradient}%`,
-            showlegend: true
+            showlegend: false
         });
     });
 
     Plotly.newPlot('plot', traces, {
         title: 'Elevation Profile',
+        // remove x axis 
         xaxis: { title: 'Distance (km)' },
-        yaxis: { title: 'Elevation (m)', range: [0, Math.max(...ele) + 50] },
+        yaxis: { title: 'Elevation (m)', zeroline: false, range: [ylim_min, ylim_max] },
         annotations: annotations,
         hovermode: 'closest'
     }, {
@@ -115,7 +143,6 @@ function haversine(lat1, lon1, lat2, lon2) {
 
 function getClimbsData(distance, elevation, lat, lon) {
     let candidates = [];
-
     let d1 = 0;
     let d2 = 1;
     while (d2 < distance.length && distance[d2] - distance[d1] < 0.25) {
@@ -183,7 +210,7 @@ function getClimbsData(distance, elevation, lat, lon) {
             elevation.slice(startClimb, top + 1),
             distance[distance.length - 1],
             lat.slice(startClimb, top + 1),
-            lon.slice(startClimb, top + 1)
+            lon.slice(startClimb, top + 1),
         );
 
         if (c.category !== 'uncategorized') {
@@ -221,6 +248,17 @@ function getClimbsData(distance, elevation, lat, lon) {
         }
     }
 
+    // Sort climbs by their position in the route and assign names
+    climbs.sort((a, b) => a.start - b.start);
+    let climb_idx = 1;
+    climbs.forEach((climb, index) => {
+        if (climb.category != 'uncategorized' && climb.category != 'hupser') {
+            climb.name = `Climb ${climb_idx}`;
+            climb_idx++;
+        } 
+    });
+
+
     return climbs;
 }
 
@@ -235,6 +273,7 @@ class Climb {
         this.elevationStart = elevationData[0];
         this.elevationTop = elevationData[elevationData.length - 1];
         this.elevationGain = this.elevationTop - this.elevationStart;
+        this.name = "Climb";
 
         if (this.length > 0) {
             this.gradient = +(this.elevationGain / (this.length * 10)).toFixed(2);
@@ -324,7 +363,7 @@ function createClimbDetailPlots(climbs) {
         const header = document.createElement('div');
         header.className = 'climb-header';
         header.innerHTML = `
-            <h3 id="climb-title-${index}">Climb ${index + 1} - Category ${climb.category}</h3>
+            <h3 id="climb-title-${index}">${climb.name}</h3>
             <div class="climb-stats">
                 <span><strong>Length:</strong> ${climb.length} km</span>
                 <span><strong>Elevation Gain:</strong> ${Math.round(climb.elevationGain)} m</span>
