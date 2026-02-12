@@ -313,6 +313,7 @@ function getClimbsData(distance, elevation, lat, lon) {
             cid++
         );
 
+
         if (c.category !== 'uncategorized') {
             classifiedClimbs.push(c);
         }
@@ -593,8 +594,15 @@ function updateMainPlotAnnotation(climbIndex, climb) {
     }
     
     // Find the annotation for this climb
-    // The annotations are in the same order as the climbs
+    // The annotations are in the same order as the climbs, but ignore hupser and uncategorized climbs
+    let addIdx = 0;
     const annotations = plotDiv.layout.annotations;
+    for (let i = 0; i < climbIndex; i++) {
+        if (annotations[i].text.split('<br>').length === 1) {
+            addIdx++;
+        }
+    }
+
     if (climbIndex < annotations.length) {
         // Update the annotation text with the new name
         let text;
@@ -603,9 +611,9 @@ function updateMainPlotAnnotation(climbIndex, climb) {
         } else {
             text = `${climb.name}<br>${climb.length}km<br>${climb.gradient}%`;
         }
-        
-        annotations[climbIndex].text = text;
-        
+
+        annotations[climbIndex + addIdx].text = text;
+
         // Adjust annotation positions to prevent overlap
         adjustAnnotationPositions(annotations);
         
