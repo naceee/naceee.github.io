@@ -58,8 +58,14 @@ document.getElementById('fileInput').addEventListener('change', function (event)
         };
     });
 
-    const ylim_min = Math.min(...ele) - 50;
-    const ylim_max = Math.max(...ele) + 150;
+    const min_ele = Math.min(...ele);
+    const max_ele = Math.max(...ele);
+    const delta_ele = max_ele - min_ele;
+
+    const ylim_min = min_ele - Math.max(20, delta_ele * 0.05);
+    const ylim_max = max_ele + Math.max(200, delta_ele * 0.2);
+
+    console.log(`Elevation range: ${min_ele}m to ${max_ele}m, y-axis limits: ${ylim_min}m to ${ylim_max}m`);
 
     // Create traces for the main plot
     let traces = [{
@@ -177,7 +183,7 @@ function getClimbsData(distance, elevation, lat, lon) {
     function classify(length, heightDiff, heightTop) {
         return (1 + Math.pow(heightTop / 2000, 2)) * Math.pow(heightDiff, 2) / length;
     }
-
+    cid = 0;
     let classifiedClimbs = [];
     for (let top of candidates) {
         let startClimb = 0;
@@ -211,6 +217,7 @@ function getClimbsData(distance, elevation, lat, lon) {
             distance[distance.length - 1],
             lat.slice(startClimb, top + 1),
             lon.slice(startClimb, top + 1),
+            cid++
         );
 
         if (c.category !== 'uncategorized') {
@@ -264,7 +271,7 @@ function getClimbsData(distance, elevation, lat, lon) {
 
 
 class Climb {
-    constructor(distanceData, elevationData, totalDistance, latData, lonData) {
+    constructor(distanceData, elevationData, totalDistance, latData, lonData, cid) {
         this.start = distanceData[0];
         this.end = distanceData[distanceData.length - 1];
         this.toGo = +(totalDistance - this.end).toFixed(1);
@@ -274,6 +281,7 @@ class Climb {
         this.elevationTop = elevationData[elevationData.length - 1];
         this.elevationGain = this.elevationTop - this.elevationStart;
         this.name = "Climb";
+        this.cid = cid;
 
         if (this.length > 0) {
             this.gradient = +(this.elevationGain / (this.length * 10)).toFixed(2);
@@ -363,7 +371,7 @@ function createClimbDetailPlots(climbs) {
         const header = document.createElement('div');
         header.className = 'climb-header';
         header.innerHTML = `
-            <h3 id="climb-title-${index}">${climb.name}</h3>
+            <h3 id="climb-title-${climb.cid}">${climb.name}</h3>
             <div class="climb-stats">
                 <span><strong>Length:</strong> ${climb.length} km</span>
                 <span><strong>Elevation Gain:</strong> ${Math.round(climb.elevationGain)} m</span>
@@ -469,7 +477,7 @@ async function fetchClimbNames(climbs) {
                 climb.name = name;
                 
                 // Update the climb title in the detail section
-                const titleElement = document.getElementById(`climb-title-${i}`);
+                const titleElement = document.getElementById(`climb-title-${climb.cid}`);
                 if (titleElement) {
                     titleElement.textContent = `${name}`;
                 }
