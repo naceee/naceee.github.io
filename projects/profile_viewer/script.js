@@ -113,6 +113,9 @@ document.getElementById('fileInput').addEventListener('change', function (event)
         });
     });
 
+    // Adjust annotation positions to prevent overlap
+    adjustAnnotationPositions(annotations);
+
     Plotly.newPlot('plot', traces, {
         title: 'Elevation Profile',
         // remove x axis 
@@ -144,6 +147,96 @@ function haversine(lat1, lon1, lat2, lon2) {
             Math.sin(dLon / 2) ** 2;
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
+
+
+function adjustAnnotationPositions(annotations) {
+    if (annotations.length === 0) return;
+    
+    // Calculate total route length from annotations
+    const allX = annotations.map(ann => ann.x);
+    const totalLength = Math.max(...allX) - Math.min(...allX);
+    const overlapThreshold = totalLength * 0.1; // 10% of total length
+    
+    // Sort annotations by x position to process them left to right
+    const sortedIndices = annotations
+        .map((ann, idx) => ({ idx, x: ann.x }))
+        .sort((a, b) => a.x - b.x);
+    
+    // Calculate vertical positions to avoid overlap
+    const positions = [];
+
+    const minVerticalSpacing = 15; // Minimum pixels between annotation boxes
+    const baseOffset = -50; // Base arrow offset (negative = above)
+    
+    sortedIndices.forEach((item, i) => {
+        const ann = annotations[item.idx];
+        const currentX = ann.x;
+        
+        // Start with the base offset (above the climb)
+        let targetOffset = baseOffset;
+        
+        // Check against previous annotations for overlap
+        for (let j = 0; j < i; j++) {
+            const prevItem = sortedIndices[j];
+            const prevAnn = annotations[prevItem.idx];
+            const prevX = prevAnn.x;
+            
+            // Calculate horizontal distance
+            const horizontalDistance = Math.abs(currentX - prevX);
+            
+            // If annotations are close horizontally, adjust vertical position
+            if (horizontalDistance < overlapThreshold) {
+                const prevOffset = positions[j] || baseOffset;
+                
+                // Calculate how much overlap there might be based on distance
+                const overlapFactor = Math.max(0, (overlapThreshold - horizontalDistance) / overlapThreshold);
+                const verticalAdjustment = minVerticalSpacing * overlapFactor;
+                
+                // Move further up if too close
+                if (horizontalDistance < overlapThreshold * 0.3) {
+                    // Very close: stack them further up
+                    targetOffset = prevOffset - minVerticalSpacing;
+                } else {
+                    // Moderately close: move up proportionally
+                    targetOffset = Math.min(targetOffset, prevOffset - verticalAdjustment);
+                }
+            }
+        }
+        
+        // Ensure we never go below the base offset (always keep arrows above)
+        targetOffset = Math.min(targetOffset, baseOffset);
+        
+        // Apply the calculated offset
+        ann.ay = targetOffset;
+        positions.push(targetOffset);
+    });
+    
+    // Second pass: ensure no two annotations have overlapping boxes
+    for (let i = 1; i < sortedIndices.length; i++) {
+        const currentItem = sortedIndices[i];
+        const currentAnn = annotations[currentItem.idx];
+        
+        for (let j = 0; j < i; j++) {
+            const prevItem = sortedIndices[j];
+            const prevAnn = annotations[prevItem.idx];
+            
+            const xDist = Math.abs(currentAnn.x - prevAnn.x);
+            
+            // If very close horizontally, make sure they're well separated vertically
+            if (xDist < overlapThreshold * 0.5) {
+                const currentY = currentAnn.y + (currentAnn.ay || baseOffset) / 5;
+                const prevY = prevAnn.y + (prevAnn.ay || baseOffset) / 5;
+                
+                // If too close vertically, push current one further up
+                if (Math.abs(currentY - prevY) < 120) {
+                    // Always move up (more negative)
+                    currentAnn.ay = Math.min(currentAnn.ay, prevAnn.ay - minVerticalSpacing * 1.5);
+                }
+            }
+        }
+    }
+}
+
 
 
 
@@ -183,7 +276,7 @@ function getClimbsData(distance, elevation, lat, lon) {
     function classify(length, heightDiff, heightTop) {
         return (1 + Math.pow(heightTop / 2000, 2)) * Math.pow(heightDiff, 2) / length;
     }
-    cid = 0;
+    let cid = 0;
     let classifiedClimbs = [];
     for (let top of candidates) {
         let startClimb = 0;
@@ -512,6 +605,9 @@ function updateMainPlotAnnotation(climbIndex, climb) {
         }
         
         annotations[climbIndex].text = text;
+        
+        // Adjust annotation positions to prevent overlap
+        adjustAnnotationPositions(annotations);
         
         // Update the plot with the new annotations
         Plotly.relayout('plot', { annotations: annotations });
