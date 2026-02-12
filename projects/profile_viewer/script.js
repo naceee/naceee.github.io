@@ -25,7 +25,7 @@ document.getElementById('fileInput').addEventListener('change', function (event)
       dist.push(dist[i - 1] + haversine(lat[i - 1], lon[i - 1], lat[i], lon[i]));
     }
 
-    let climbs = getClimbsData(dist, ele);
+    let climbs = getClimbsData(dist, ele, lat, lon);
 
     for (let i = 0; i < climbs.length; i++) {
         console.log(climbs[i])
@@ -84,7 +84,11 @@ document.getElementById('fileInput').addEventListener('change', function (event)
         title: 'Elevation Profile',
         xaxis: { title: 'Distance (km)' },
         yaxis: { title: 'Elevation (m)', range: [0, Math.max(...ele) + 50] },
-        annotations: annotations
+        annotations: annotations,
+        hovermode: 'closest'
+    }, {
+        displayModeBar: false,
+        staticPlot: true
     });
 
     // Create detailed climb plots
@@ -109,7 +113,7 @@ function haversine(lat1, lon1, lat2, lon2) {
 
 
 
-function getClimbsData(distance, elevation) {
+function getClimbsData(distance, elevation, lat, lon) {
     let candidates = [];
 
     let d1 = 0;
@@ -173,11 +177,13 @@ function getClimbsData(distance, elevation) {
             i--;
         }
 
-        // Create Climb object
+        // Create Climb object with coordinates
         let c = new Climb(
             distance.slice(startClimb, top + 1),
             elevation.slice(startClimb, top + 1),
-            distance[distance.length - 1]
+            distance[distance.length - 1],
+            lat.slice(startClimb, top + 1),
+            lon.slice(startClimb, top + 1)
         );
 
         if (c.category !== 'uncategorized') {
@@ -220,7 +226,7 @@ function getClimbsData(distance, elevation) {
 
 
 class Climb {
-    constructor(distanceData, elevationData, totalDistance) {
+    constructor(distanceData, elevationData, totalDistance, latData, lonData) {
         this.start = distanceData[0];
         this.end = distanceData[distanceData.length - 1];
         this.toGo = +(totalDistance - this.end).toFixed(1);
@@ -238,6 +244,8 @@ class Climb {
 
         this.distance = distanceData;
         this.elevation = elevationData;
+        this.lat = latData;
+        this.lon = lonData;
         this.hardness = 0;
         this.category = '';
 
@@ -281,7 +289,7 @@ class Climb {
             this.category = '2';
         } else if (this.hardness > 15) {
             this.category = '3';
-        } else if (this.hardness > 5) {
+        } else if (this.hardness > 4) {
             this.category = '4';
         } else if (this.hardness > 1) {
             this.category = 'hupser';
@@ -296,6 +304,8 @@ function createClimbDetailPlots(climbs) {
     const climbDetailsContainer = document.getElementById('climb-details');
     climbDetailsContainer.innerHTML = ''; // Clear previous content
 
+    climbs = climbs.filter(climb => climb.category !== 'hupser' && climb.category !== 'uncategorized');
+
     if (climbs.length === 0) {
         climbDetailsContainer.innerHTML = '<p style="text-align: center; color: #666;">No significant climbs found in this route.</p>';
         return;
@@ -308,12 +318,13 @@ function createClimbDetailPlots(climbs) {
         // Create container for this climb
         const climbDiv = document.createElement('div');
         climbDiv.className = 'climb-detail';
+        climbDiv.id = `climb-container-${index}`;
         
         // Create header with climb stats
         const header = document.createElement('div');
         header.className = 'climb-header';
         header.innerHTML = `
-            <h3>Climb ${index + 1} - Category ${climb.category}</h3>
+            <h3 id="climb-title-${index}">Climb ${index + 1} - Category ${climb.category}</h3>
             <div class="climb-stats">
                 <span><strong>Length:</strong> ${climb.length} km</span>
                 <span><strong>Elevation Gain:</strong> ${Math.round(climb.elevationGain)} m</span>
@@ -356,18 +367,25 @@ function createClimbDetailPlots(climbs) {
                 zeroline: false,
                 range: [minElev - yRangePadding, maxElev + yRangePadding]
             },
-            hovermode: 'x unified',
+            hovermode: 'closest',
             showlegend: false,
             margin: { t: 20, b: 20, l: 20, r: 20 },
             plot_bgcolor: 'white',
             paper_bgcolor: 'white'
         };
 
-        Plotly.newPlot(plotDiv.id, traces, layout, {responsive: true});
+        Plotly.newPlot(plotDiv.id, traces, layout, {
+            responsive: true,
+            displayModeBar: false,
+            staticPlot: true
+        });
         
         // Add segment labels as annotations after plot is created
         addSegmentLabels(plotDiv.id, segments, climb);
     });
+    
+    // Fetch names for all climbs asynchronously (won't block the UI)
+    fetchClimbNames(climbs);
 }
 
 
@@ -392,6 +410,79 @@ function calculateMax100mGradient(climb) {
     }
     
     return maxGradient;
+}
+
+
+async function fetchClimbNames(climbs) {
+    // Process climbs one by one with a delay to respect OSM rate limits
+    for (let i = 0; i < climbs.length; i++) {
+        const climb = climbs[i];
+        
+        // Add delay between requests (1 second to respect OSM's Nominatim usage policy)
+        if (i > 0) {
+            await new Promise(resolve => setTimeout(resolve, 1100));
+        }
+        
+        try {
+            const name = await getClimbName(climb);
+            if (name) {
+                // Update the climb title
+                const titleElement = document.getElementById(`climb-title-${i}`);
+                if (titleElement) {
+                    titleElement.textContent = `${name} - Category ${climb.category}`;
+                }
+            }
+        } catch (error) {
+            console.error(`Failed to fetch name for climb ${i + 1}:`, error);
+        }
+    }
+}
+
+
+async function getClimbName(climb) {
+    const topIndex = climb.lat.length - 1;
+
+    const lat = climb.lat[topIndex];
+    const lon = climb.lon[topIndex];
+
+    try {
+        const url =
+            `https://us1.locationiq.com/v1/reverse` +
+            `?key=pk.618803e0fa6be84950d2493e50142eec` +
+            `&lat=${lat}` +
+            `&lon=${lon}` +
+            `&format=json`;
+
+        console.log(`Fetching name for climb at lat: ${lat}, lon: ${lon}`);
+
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        return extractClimbName(data);
+
+    } catch (error) {
+        console.error("Error fetching location name:", error);
+        return null;
+    }
+}
+
+
+function extractClimbName(osmData) {
+    if (!osmData || !osmData.address) {
+        return null;
+    }
+
+    const addr = osmData.address;
+
+    const possibleNames = [
+        'peak', 'mountain_pass', 'tower', 'hamlet', 'village', 
+        'suburb', 'neighbourhood', 'town', 'road', 'city'];
+    let names = possibleNames.map(key => addr[key]).filter(name => name);
+
+    return names.length > 0 ? names[0] : (osmData.display_name ? osmData.display_name.split(",")[0].trim() : null);
 }
 
 
@@ -498,6 +589,12 @@ function addSegmentLabels(plotId, segments, climb) {
         if (!plotDiv || !plotDiv.layout) return;
         
         const annotations = [];
+        const isMobile = window.innerWidth <= 768;
+        
+        // Adjust font sizes based on device
+        const bottomLabelSize = isMobile ? 18 : 16;
+        const elevationLabelSize = isMobile ? 18 : 16;
+        const distanceLabelSize = isMobile ? 18 : 16;
         
         // Segment labels at the bottom
         segments.forEach((segment, idx) => {
@@ -508,9 +605,8 @@ function addSegmentLabels(plotId, segments, climb) {
             const segmentStart = segment.distances[0];
             const segmentMid = segmentStart + segment.length / 2;
             // Format the label
-            const lengthKm = (segment.length).toFixed(1);
             const gradientText = segment.gradient.toFixed(1);
-            const label = `${lengthKm}km<br>${gradientText}%`;
+            const label = `${gradientText}%`;
             
             annotations.push({
                 x: segmentMid,
@@ -521,49 +617,106 @@ function addSegmentLabels(plotId, segments, climb) {
                 text: label,
                 showarrow: false,
                 font: {
-                    size: 11,
+                    size: bottomLabelSize,
                     color: 'black',
                     family: 'Arial, sans-serif',
                     weight: 'bold'
                 },
-                bgcolor: 'rgba(255, 255, 255, 0.7)',
-                borderpad: 3,
-                borderwidth: 0
+                //bgcolor: 'rgba(255, 255, 255, 0.7)',
+                //borderpad: 3,
+                // borderwidth: 0
             });
         });
 
-        xMargin = (climb.climbDistance[climb.climbDistance.length - 1] - climb.climbDistance[0]) * 0.005;
+        // Distance markers at each segment boundary (vertical black lines)
+        // Start with 0.0 km
+        annotations.push({
+            x: climb.climbDistance[0],
+            y: 0,
+            yref: 'paper',
+            xref: 'x',
+            xanchor: 'center',
+            yanchor: 'top',
+            text: '0.0',
+            showarrow: false,
+            font: {
+                size: distanceLabelSize,
+                color: '#555',
+                family: 'Arial, sans-serif'
+            }
+        });
+
+        // Add distance labels at each segment boundary
+        segments.forEach((segment, idx) => {
+            if (idx < segments.length - 1) {
+                // Distance from start of climb
+                const distanceFromStart = segment.distances[segment.distances.length - 1] - climb.climbDistance[0];
+                const nextSeg = segments[idx + 1];
+                const distanceToNext = nextSeg.distances[nextSeg.distances.length - 1] - segment.distances[segment.distances.length - 1];
+                console.log(`Segment ${idx + 1} ends at ${distanceFromStart.toFixed(1)} km, next segment starts in ${distanceToNext.toFixed(2)} km`);
+                if (distanceToNext > 0.2) { // Only add label if next segment is at least 200m away
+                    annotations.push({
+                        x: segment.distances[segment.distances.length - 1],
+                        y: 0,
+                        yref: 'paper',
+                        xref: 'x',
+                        xanchor: 'center',
+                        yanchor: 'top',
+                        text: distanceFromStart.toFixed(1),
+                        showarrow: false,
+                        font: {
+                            size: distanceLabelSize,
+                            color: '#555',
+                            family: 'Arial, sans-serif'
+                        }
+                    });
+                }
+            }
+        });
+
+        // End with total length
+        const totalLength = climb.climbDistance[climb.climbDistance.length - 1] - climb.climbDistance[0];
+        annotations.push({
+            x: climb.climbDistance[climb.climbDistance.length - 1],
+            y: 0,
+            yref: 'paper',
+            xref: 'x',
+            xanchor: 'center',
+            yanchor: 'top',
+            text: totalLength.toFixed(1),
+            showarrow: false,
+            font: {
+                size: distanceLabelSize,
+                color: '#555',
+                family: 'Arial, sans-serif'
+            }
+        });
+
+        const xMargin = (climb.climbDistance[climb.climbDistance.length - 1] - climb.climbDistance[0]) * 0.005;
 
         // Start elevation annotation
         const startElev = Math.round(climb.elevation[0]);
         annotations.push({
-            x: -xMargin, // Slightly to the left of the start
-            y: climb.elevation[0], // Position above the start point
+            x: -xMargin,
+            y: climb.elevation[0],
             xanchor: 'right',
             xref: 'x',
             yref: 'y',
             text: `${startElev}m`,
             showarrow: false,
-            // arrowhead: 2,
-            // arrowsize: 1,
-            // arrowwidth: 2,
             arrowcolor: 'black',
             font: {
-                size: 16,
+                size: elevationLabelSize,
                 color: 'black',
                 family: 'Arial, sans-serif',
                 weight: 'bold'
-            },
-            // bgcolor: 'rgba(255, 255, 255, 0.9)',
-            // borderpad: 3,
-            // borderwidth: 1,
-            // bordercolor: 'black'
+            }
         });
         
         // End elevation annotation
         const endElev = Math.round(climb.elevation[climb.elevation.length - 1]);
         annotations.push({
-            x: climb.climbDistance[climb.climbDistance.length - 1] + xMargin, // Slightly to the right of the end
+            x: climb.climbDistance[climb.climbDistance.length - 1] + xMargin,
             y: climb.elevation[climb.elevation.length - 1],
             xanchor: 'left',
             xref: 'x',
@@ -572,15 +725,11 @@ function addSegmentLabels(plotId, segments, climb) {
             showarrow: false,
             arrowcolor: 'black',
             font: {
-                size: 16,
+                size: elevationLabelSize,
                 color: 'black',
                 family: 'Arial, sans-serif',
                 weight: 'bold'
-            },
-            // bgcolor: 'rgba(255, 255, 255, 0.9)',
-            // borderpad: 3,
-            // borderwidth: 1,
-            // bordercolor: 'black'
+            }
         });
         
         Plotly.relayout(plotId, { annotations: annotations });
@@ -588,10 +737,20 @@ function addSegmentLabels(plotId, segments, climb) {
 }
 
 
+function max(a, b) {
+    return a > b ? a : b
+} 
+
 function calculateAdaptiveSegments(climb) {
     const segments = [];
-    const minSegmentLength = 0.1; // Minimum 100m segment
-    const gradientTolerance = 1.5; // Allow 1.5% variation within a segment
+    
+    // Detect if mobile device
+    const isMobile = window.innerWidth <= 768;
+
+    
+    // Adjust parameters based on device
+    const minSegmentLength = isMobile ? max(climb.length / 20, 0.1) * 2 : max(climb.length / 25, 0.1); // 250m on mobile, 100m on desktop
+    const gradientTolerance = isMobile ? 3 : 2; // More tolerance on mobile
     
     let i = 0;
     
@@ -599,7 +758,7 @@ function calculateAdaptiveSegments(climb) {
         let segmentStart = i;
         let segmentEnd = i + 1;
         
-        // Find a reasonable initial window (at least 100m or 10 points)
+        // Find a reasonable initial window
         while (segmentEnd < climb.climbDistance.length && 
                (climb.climbDistance[segmentEnd] - climb.climbDistance[segmentStart] < minSegmentLength ||
                 segmentEnd - segmentStart < 10)) {
@@ -631,7 +790,6 @@ function calculateAdaptiveSegments(climb) {
             let extGradient = extDist > 0 ? (extElev / (extDist * 10)) : 0;
             
             // Check if gradients are similar (within tolerance)
-            // And if the extension gradient doesn't differ too much from current
             if (Math.abs(testGradient - currentGradient) <= gradientTolerance &&
                 Math.abs(extGradient - currentGradient) <= gradientTolerance * 1.5) {
                 extendedEnd = testEnd;
@@ -655,6 +813,8 @@ function calculateAdaptiveSegments(climb) {
     
     // Post-process: merge very short segments with similar gradients
     let merged = [];
+    const mergeThreshold = isMobile ? minSegmentLength * 2.5 : minSegmentLength * 2;
+    
     for (let j = 0; j < segments.length; j++) {
         if (merged.length === 0) {
             merged.push(segments[j]);
@@ -662,8 +822,8 @@ function calculateAdaptiveSegments(climb) {
             let lastSeg = merged[merged.length - 1];
             let currentSeg = segments[j];
             
-            // If current segment is very short and gradient is similar to previous
-            if (currentSeg.length < minSegmentLength * 2 && 
+            // If current segment is short and gradient is similar to previous, merge
+            if (currentSeg.length < mergeThreshold && 
                 Math.abs(currentSeg.gradient - lastSeg.gradient) <= gradientTolerance) {
                 // Merge with previous segment
                 lastSeg.distances = lastSeg.distances.concat(currentSeg.distances.slice(1));

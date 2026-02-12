@@ -100,3 +100,52 @@ input[type="file"] {
   height: 400px;
   margin: 20px 0;
 }
+
+/* Mobile responsive improvements */
+@media (max-width: 768px) {
+  body {
+    padding: 10px;
+  }
+  
+  .main-content {
+    padding: 20px;
+  }
+  
+  h1 {
+    font-size: 1.5em;
+  }
+  
+  #plot {
+    height: 300px;
+  }
+  
+  .climb-plot {
+    height: 300px;
+  }
+  
+  .climb-header h3 {
+    font-size: 1.2em;
+  }
+  
+  .climb-stats {
+    gap: 10px;
+    font-size: 0.85em;
+  }
+  
+  .climb-stats span {
+    padding: 4px 8px;
+  }
+  
+  .climb-detail {
+    padding: 15px;
+    margin-bottom: 20px;
+  }
+}
+
+/* Improve touch targets on mobile */
+@media (hover: none) and (pointer: coarse) {
+  .custom-file-upload {
+    padding: 15px 25px;
+    font-size: 1.1em;
+  }
+}
