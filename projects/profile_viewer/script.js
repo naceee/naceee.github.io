@@ -465,15 +465,48 @@ async function fetchClimbNames(climbs) {
         try {
             const name = await getClimbName(climb);
             if (name) {
-                // Update the climb title
+                // Update the climb object's name
+                climb.name = name;
+                
+                // Update the climb title in the detail section
                 const titleElement = document.getElementById(`climb-title-${i}`);
                 if (titleElement) {
-                    titleElement.textContent = `${name} - Category ${climb.category}`;
+                    titleElement.textContent = `${name}`;
                 }
+                
+                // Update the main plot annotation
+                updateMainPlotAnnotation(i, climb);
             }
         } catch (error) {
             console.error(`Failed to fetch name for climb ${i + 1}:`, error);
         }
+    }
+}
+
+
+function updateMainPlotAnnotation(climbIndex, climb) {
+    // Get the current plot
+    const plotDiv = document.getElementById('plot');
+    if (!plotDiv || !plotDiv.layout || !plotDiv.layout.annotations) {
+        return;
+    }
+    
+    // Find the annotation for this climb
+    // The annotations are in the same order as the climbs
+    const annotations = plotDiv.layout.annotations;
+    if (climbIndex < annotations.length) {
+        // Update the annotation text with the new name
+        let text;
+        if (climb.category === 'hupser' || climb.category === 'uncategorized') {
+            text = `${climb.length}km<br>${climb.gradient}%`;
+        } else {
+            text = `${climb.name}<br>${climb.length}km<br>${climb.gradient}%`;
+        }
+        
+        annotations[climbIndex].text = text;
+        
+        // Update the plot with the new annotations
+        Plotly.relayout('plot', { annotations: annotations });
     }
 }
 
@@ -888,4 +921,3 @@ document.getElementById('fileInput').addEventListener('change', function() {
   const fileName = this.files.length ? this.files[0].name : 'No file selected.';
   document.getElementById('file-name').textContent = fileName;
 });
-
