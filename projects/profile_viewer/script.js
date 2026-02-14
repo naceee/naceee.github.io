@@ -349,10 +349,17 @@ function getClimbsData(distance, elevation, lat, lon) {
         }
     }
 
-    // Sort climbs by their position in the route and assign names
+    // Sort climbs by their position in the route and assign IDs and names
     climbs.sort((a, b) => a.start - b.start);
-    let climb_idx = 1;
+    
+    // Assign unique IDs to all climbs (including hupsers)
     climbs.forEach((climb, index) => {
+        climb.id = index;
+    });
+    
+    // Assign display names only to non-hupser climbs
+    let climb_idx = 1;
+    climbs.forEach((climb) => {
         if (climb.category != 'uncategorized' && climb.category != 'hupser') {
             climb.name = `Climb ${climb_idx}`;
             climb_idx++;
@@ -445,27 +452,28 @@ function createClimbDetailPlots(climbs) {
     const climbDetailsContainer = document.getElementById('climb-details');
     climbDetailsContainer.innerHTML = ''; // Clear previous content
 
-    climbs = climbs.filter(climb => climb.category !== 'hupser' && climb.category !== 'uncategorized');
+    // Filter out hupsers and uncategorized climbs for display
+    const displayedClimbs = climbs.filter(climb => climb.category !== 'hupser' && climb.category !== 'uncategorized');
 
-    if (climbs.length === 0) {
+    if (displayedClimbs.length === 0) {
         climbDetailsContainer.innerHTML = '<p style="text-align: center; color: #666;">No significant climbs found in this route.</p>';
         return;
     }
 
-    climbs.forEach((climb, index) => {
+    displayedClimbs.forEach((climb, displayIndex) => {
         // Calculate max 100m gradient
         const max100mGradient = calculateMax100mGradient(climb);
         
         // Create container for this climb
         const climbDiv = document.createElement('div');
         climbDiv.className = 'climb-detail';
-        climbDiv.id = `climb-container-${index}`;
+        climbDiv.id = `climb-container-${displayIndex}`;
         
-        // Create header with climb stats
+        // Create header with climb stats - use the climb's original ID for title lookup
         const header = document.createElement('div');
         header.className = 'climb-header';
         header.innerHTML = `
-            <h3 id="climb-title-${climb.cid}">${climb.name}</h3>
+            <h3 id="climb-title-${climb.id}">${climb.name}</h3>
             <div class="climb-stats">
                 <span><strong>Length:</strong> ${climb.length} km</span>
                 <span><strong>Elevation Gain:</strong> ${Math.round(climb.elevationGain)} m</span>
@@ -479,7 +487,7 @@ function createClimbDetailPlots(climbs) {
         // Create plot div
         const plotDiv = document.createElement('div');
         plotDiv.className = 'climb-plot';
-        plotDiv.id = `climb-plot-${index}`;
+        plotDiv.id = `climb-plot-${displayIndex}`;
         climbDiv.appendChild(plotDiv);
 
         climbDetailsContainer.appendChild(climbDiv);
@@ -525,8 +533,8 @@ function createClimbDetailPlots(climbs) {
         addSegmentLabels(plotDiv.id, segments, climb);
     });
     
-    // Fetch names for all climbs asynchronously (won't block the UI)
-    fetchClimbNames(climbs);
+    // Fetch names for displayed climbs only (won't block the UI)
+    fetchClimbNames(displayedClimbs, climbs);
 }
 
 
@@ -554,10 +562,10 @@ function calculateMax100mGradient(climb) {
 }
 
 
-async function fetchClimbNames(climbs) {
-    // Process climbs one by one with a delay to respect OSM rate limits
-    for (let i = 0; i < climbs.length; i++) {
-        const climb = climbs[i];
+async function fetchClimbNames(displayedClimbs, allClimbs) {
+    // Process displayed climbs one by one with a delay to respect OSM rate limits
+    for (let i = 0; i < displayedClimbs.length; i++) {
+        const climb = displayedClimbs[i];
         
         // Add delay between requests (1 second to respect OSM's Nominatim usage policy)
         if (i > 0) {
@@ -570,14 +578,17 @@ async function fetchClimbNames(climbs) {
                 // Update the climb object's name
                 climb.name = name;
                 
-                // Update the climb title in the detail section
-                const titleElement = document.getElementById(`climb-title-${climb.cid}`);
+                // Update the climb title in the detail section using climb's ID
+                const titleElement = document.getElementById(`climb-title-${climb.id}`);
                 if (titleElement) {
                     titleElement.textContent = `${name}`;
                 }
                 
-                // Update the main plot annotation
-                updateMainPlotAnnotation(i, climb);
+                // Update the main plot annotation - need to find the annotation index in allClimbs
+                const annotationIndex = allClimbs.findIndex(c => c.id === climb.id);
+                if (annotationIndex !== -1) {
+                    updateMainPlotAnnotation(annotationIndex, climb);
+                }
             }
         } catch (error) {
             console.error(`Failed to fetch name for climb ${i + 1}:`, error);
@@ -586,30 +597,21 @@ async function fetchClimbNames(climbs) {
 }
 
 
-function updateMainPlotAnnotation(climbIndex, climb) {
+function updateMainPlotAnnotation(annotationIndex, climb) {
     // Get the current plot
     const plotDiv = document.getElementById('plot');
     if (!plotDiv || !plotDiv.layout || !plotDiv.layout.annotations) {
         return;
     }
     
-    // Find the annotation for this climb
-    // The annotations are in the same order as the climbs, but ignore hupser and uncategorized climbs
-    let addIdx = 0;
     const annotations = plotDiv.layout.annotations;
-    let k = 0;
-    while (k < climbIndex + addIdx && climbIndex + addIdx < annotations.length) {
-        if (annotations[k].text.split('<br>').length === 2) {
-            addIdx++;
-        } 
-        k++;
-    }
-
-    if (climbIndex < annotations.length) {
+    
+    // The annotations array corresponds directly to allClimbs array
+    // So we can use annotationIndex directly
+    if (annotationIndex < annotations.length) {
         // Update the annotation text with the new name
         let text = `${climb.name}<br>${climb.length}km<br>${climb.gradient}%`;
-
-        annotations[climbIndex + addIdx].text = text;
+        annotations[annotationIndex].text = text;
 
         // Adjust annotation positions to prevent overlap
         adjustAnnotationPositions(annotations);
