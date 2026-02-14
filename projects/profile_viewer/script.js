@@ -756,15 +756,47 @@ async function fetchClimbNames(displayedClimbs, allClimbs) {
                     titleElement.textContent = `${name}`;
                 }
                 
-                // Update the main plot annotation - need to find the annotation index in allClimbs
+                // Update the annotation text (but don't adjust positions yet)
                 const annotationIndex = allClimbs.findIndex(c => c.id === climb.id);
                 if (annotationIndex !== -1) {
-                    updateMainPlotAnnotation(annotationIndex, climb);
+                    updateMainPlotAnnotationTextOnly(annotationIndex, climb);
                 }
             }
         } catch (error) {
             console.error(`Failed to fetch name for climb ${i + 1}:`, error);
         }
+    }
+    
+    // After all names are fetched, adjust annotation positions once
+    const plotDiv = document.getElementById('plot');
+    if (plotDiv && plotDiv.layout && plotDiv.layout.annotations) {
+        await adjustAnnotationPositions(plotDiv.layout.annotations);
+    }
+}
+
+
+function updateMainPlotAnnotationTextOnly(annotationIndex, climb) {
+    // Get the current plot
+    const plotDiv = document.getElementById('plot');
+    if (!plotDiv || !plotDiv.layout || !plotDiv.layout.annotations) {
+        return;
+    }
+    
+    const annotations = plotDiv.layout.annotations;
+    
+    // The annotations array corresponds directly to allClimbs array
+    // So we can use annotationIndex directly
+    if (annotationIndex < annotations.length) {
+        // Update the annotation text with the new name
+        let text = `${climb.name}<br>${climb.length}km<br>${climb.gradient}%`;
+        
+        // Wrap text to prevent long lines
+        text = wrapAnnotationText(text, 20);
+        
+        annotations[annotationIndex].text = text;
+        
+        // Update the plot with the new annotations (but don't adjust positions)
+        Plotly.relayout('plot', { annotations: annotations });
     }
 }
 
