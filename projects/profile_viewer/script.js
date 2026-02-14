@@ -38,11 +38,16 @@ document.getElementById('fileInput').addEventListener('change', function (event)
         let topDist = climb.distance[topIndex];
         let topElev = climb.elevation[topIndex];
 
+        let text;
         if (climb.category === 'hupser' || climb.category === 'uncategorized') {
             text = `${climb.length}km<br>${climb.gradient}%`;
         } else {
             text = `${climb.name}<br>${climb.length}km<br>${climb.gradient}%`;
         }
+        
+        // Wrap text to prevent long lines
+        text = wrapAnnotationText(text, 20);
+        
         return {
             x: topDist,
             y: topElev,
@@ -146,6 +151,49 @@ function haversine(lat1, lon1, lat2, lon2) {
             Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
             Math.sin(dLon / 2) ** 2;
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+
+function wrapAnnotationText(text, maxCharsPerLine = 20) {
+    // Split by existing line breaks first
+    const lines = text.split('<br>');
+    const wrappedLines = [];
+    
+    lines.forEach(line => {
+        if (line.length <= maxCharsPerLine) {
+            wrappedLines.push(line);
+        } else {
+            // Wrap this line
+            const words = line.split(' ');
+            let currentLine = '';
+            
+            words.forEach((word, index) => {
+                // Check if adding this word would exceed the limit
+                const testLine = currentLine ? `${currentLine} ${word}` : word;
+                
+                if (testLine.length <= maxCharsPerLine) {
+                    currentLine = testLine;
+                } else {
+                    // Current line is full, push it and start new line
+                    if (currentLine) {
+                        wrappedLines.push(currentLine);
+                        currentLine = word;
+                    } else {
+                        // Single word is longer than max, split it
+                        wrappedLines.push(word);
+                        currentLine = '';
+                    }
+                }
+            });
+            
+            // Push remaining text
+            if (currentLine) {
+                wrappedLines.push(currentLine);
+            }
+        }
+    });
+    
+    return wrappedLines.join('<br>');
 }
 
 
@@ -485,7 +533,7 @@ function createClimbDetailPlots(climbs) {
                 <span><strong>Distance to go:</strong> ${climb.toGo} km</span>
             </div>
             <div class="climb-time-estimates">
-                <span class="time-label">Estimated time:</span>
+                <span class="time-label">Estimated time @ 75kg:</span>
                 <span class="time-estimate time-2w">2 W/kg: ${timeEstimates.time2w}</span>
                 <span class="time-estimate time-3w">3 W/kg: ${timeEstimates.time3w}</span>
                 <span class="time-estimate time-4w">4 W/kg: ${timeEstimates.time4w}</span>
@@ -574,7 +622,7 @@ function calculateMax100mGradient(climb) {
 function calculateClimbingTime(climb) {
     // Constants
     const riderMass = 75; // kg
-    const bikeMass = 10; // kg  
+    const bikeMass = 8; // kg  
     const totalMass = riderMass + bikeMass;
     const g = 9.81; // gravity m/s^2
     const Crr = 0.004; // rolling resistance coefficient
@@ -688,6 +736,10 @@ function updateMainPlotAnnotation(annotationIndex, climb) {
     if (annotationIndex < annotations.length) {
         // Update the annotation text with the new name
         let text = `${climb.name}<br>${climb.length}km<br>${climb.gradient}%`;
+        
+        // Wrap text to prevent long lines
+        text = wrapAnnotationText(text, 20);
+        
         annotations[annotationIndex].text = text;
 
         // Adjust annotation positions to prevent overlap
