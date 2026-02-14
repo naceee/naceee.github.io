@@ -1,197 +1,366 @@
+:root {
+  --color-primary: #2d6a4f;
+  --color-primary-light: #40916c;
+  --color-primary-dark: #1b4332;
+  --color-accent: #52b788;
+  --color-bg: #f8f9fa;
+  --color-surface: #ffffff;
+  --color-text: #212529;
+  --color-text-muted: #6c757d;
+  --color-border: #dee2e6;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
 body {
-  font-family: Arial, sans-serif;
-  background-color: #f5f5f5;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
   margin: 0;
-  padding: 20px 20px;
+  padding: 0;
+  color: var(--color-text);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Header */
+.header {
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  padding: 24px 0;
+  box-shadow: var(--shadow-sm);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.logo svg {
+  color: var(--color-primary);
+}
+
+.tagline {
+  margin: 8px 0 0 0;
+  color: var(--color-text-muted);
+  font-size: 0.95rem;
+}
+
+/* Upload Section */
+.upload-section {
+  margin: 48px 0;
+}
+
+.upload-card {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  padding: 48px;
   text-align: center;
-}
-
-.main-content {
+  box-shadow: var(--shadow-md);
   max-width: 600px;
-  margin: 0 auto 20px auto;
-  background: #fff;
-  padding: 30px;
-  border-radius: 10px;
-  /* box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); */
+  margin: 0 auto;
 }
 
-h1 {
-  color: #333;
-  margin-top: 0;
+.upload-card h2 {
+  margin: 0 0 12px 0;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.upload-description {
+  color: var(--color-text-muted);
+  margin: 0 0 32px 0;
+  font-size: 1rem;
+  line-height: 1.6;
 }
 
 input[type="file"] {
   display: none;
 }
 
-.custom-file-upload {
-  display: inline-block;
-  background-color: #94cc94;
+.file-upload-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
   color: white;
-  padding: 10px 20px;
-  border-radius: 6px;
-  margin-top: 20px;
+  padding: 16px 32px;
+  border-radius: var(--radius-md);
   cursor: pointer;
-  font-weight: 500;
-  transition: background-color 0.2s ease, transform 0.1s ease;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-sm);
+  border: none;
 }
 
-.custom-file-upload:hover {
-  background-color: #007f00;
-  transform: scale(1.02);
+.file-upload-button:hover {
+  background: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 100%);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }
 
-#file-name {
-  margin-top: 10px;
-  color: #666;
+.file-upload-button svg {
+  width: 20px;
+  height: 20px;
 }
 
-#plot {
-  margin: 0 auto;
-  width: 100%;
-  max-width: 1200px;
+.file-status {
+  margin-top: 16px;
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+}
+
+/* Section Titles */
+.section-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0 0 24px 0;
+  padding-bottom: 12px;
+  border-bottom: 3px solid var(--color-primary);
+  display: inline-block;
+}
+
+/* Plot Section */
+.plot-section {
+  margin: 48px 0;
+}
+
+.elevation-plot {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  padding: 20px;
   height: 500px;
-  background-color: #fff;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--color-border);
+  overflow: hidden; /* Clip content to rounded corners */
 }
 
-#climb-details {
-  max-width: 1200px;
-  margin: 40px auto;
+/* Fix Plotly internal elements */
+.elevation-plot .main-svg {
+  border-radius: var(--radius-lg);
+}
+
+.elevation-plot .plotly {
+  border-radius: var(--radius-lg);
+}
+
+/* Climbs Section */
+.climbs-section {
+  margin: 48px 0 80px 0;
 }
 
 .climb-detail {
-  background: #fff;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  padding: 20px;
-  margin-bottom: 30px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  margin-bottom: 32px;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--color-border);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.climb-header {
-  margin-bottom: 20px;
+.climb-detail:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
 }
 
 .climb-header h3 {
-  color: #333;
-  margin: 0 0 10px 0;
-  font-size: 1.5em;
+  color: var(--color-primary);
+  margin: 0 0 20px 0;
+  font-size: 1.5rem;
+  font-weight: 700;
 }
 
 .climb-stats {
   display: flex;
-  gap: 20px;
+  gap: 12px;
   flex-wrap: wrap;
-  color: #666;
-  font-size: 0.95em;
+  margin-bottom: 16px;
 }
 
 .climb-stats span {
-  padding: 5px 10px;
-  background: #f5f5f5;
-  border-radius: 4px;
+  padding: 8px 16px;
+  background: var(--color-bg);
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  color: var(--color-text);
+  font-weight: 500;
+  border: 1px solid var(--color-border);
+}
+
+.climb-stats strong {
+  color: var(--color-text);
+  font-weight: 600;
 }
 
 .climb-time-estimates {
   display: flex;
-  gap: 15px;
+  gap: 12px;
   flex-wrap: wrap;
-  margin-top: 12px;
-  padding-top: 12px;
-  border-top: 1px solid #e0e0e0;
-  font-size: 0.9em;
+  padding-top: 16px;
+  border-top: 2px solid var(--color-border);
 }
 
 .time-label {
-  color: #555;
+  color: var(--color-text);
   font-weight: 600;
   align-self: center;
+  font-size: 0.95rem;
 }
 
 .time-estimate {
-  padding: 5px 12px;
-  border-radius: 4px;
-  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 0.9rem;
 }
 
 .time-2w {
-  background: #e3f2fd;
-  color: #1565c0;
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  color: #0d47a1;
+  border: 1px solid #90caf9;
 }
 
 .time-3w {
-  background: #fff3e0;
+  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
   color: #e65100;
+  border: 1px solid #ffb74d;
 }
 
 .time-4w {
-  background: #fce4ec;
-  color: #c2185b;
+  background: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 100%);
+  color: #880e4f;
+  border: 1px solid #f48fb1;
 }
 
 .climb-plot {
   width: 100%;
   height: 400px;
-  margin: 20px 0;
+  margin: 24px 0 12px 0;
+  border-radius: var(--radius-md);
+  overflow: hidden;
 }
 
-/* Mobile responsive improvements */
+/* Footer */
+.footer {
+  background: var(--color-surface);
+  border-top: 1px solid var(--color-border);
+  padding: 32px 0;
+  margin-top: auto;
+  text-align: center;
+}
+
+.footer p {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+}
+
+/* Mobile Responsive */
 @media (max-width: 768px) {
-  body {
-    padding: 10px;
+  .container {
+    padding: 0 16px;
   }
-  
-  .main-content {
+
+  .header {
+    padding: 16px 0;
+  }
+
+  .logo {
+    font-size: 1.5rem;
+  }
+
+  .tagline {
+    font-size: 0.85rem;
+  }
+
+  .upload-section {
+    margin: 32px 0;
+  }
+
+  .upload-card {
+    padding: 32px 24px;
+  }
+
+  .upload-card h2 {
+    font-size: 1.5rem;
+  }
+
+  .upload-description {
+    font-size: 0.9rem;
+  }
+
+  .file-upload-button {
+    padding: 14px 28px;
+    font-size: 0.95rem;
+  }
+
+  .section-title {
+    font-size: 1.25rem;
+  }
+
+  .elevation-plot {
+    height: 300px;
+    padding: 12px;
+  }
+
+  .climb-detail {
     padding: 20px;
+    margin-bottom: 24px;
   }
-  
-  h1 {
-    font-size: 1.5em;
-  }
-  
-  #plot {
-    height: 300px;
-  }
-  
-  .climb-plot {
-    height: 300px;
-  }
-  
+
   .climb-header h3 {
-    font-size: 1.2em;
+    font-size: 1.25rem;
   }
-  
+
   .climb-stats {
-    gap: 10px;
-    font-size: 0.85em;
+    gap: 8px;
   }
-  
+
   .climb-stats span {
-    padding: 4px 8px;
+    padding: 6px 12px;
+    font-size: 0.85rem;
   }
-  
+
   .climb-time-estimates {
     gap: 8px;
-    font-size: 0.8em;
   }
-  
+
   .time-estimate {
-    padding: 4px 10px;
+    padding: 6px 12px;
+    font-size: 0.85rem;
   }
-  
-  .climb-detail {
-    padding: 15px;
-    margin-bottom: 20px;
+
+  .climb-plot {
+    height: 300px;
   }
 }
 
 /* Improve touch targets on mobile */
 @media (hover: none) and (pointer: coarse) {
-  .custom-file-upload {
-    padding: 15px 25px;
-    font-size: 1.1em;
+  .file-upload-button {
+    padding: 18px 32px;
+    font-size: 1.05rem;
   }
 }

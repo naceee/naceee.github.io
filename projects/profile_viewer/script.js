@@ -118,13 +118,16 @@ document.getElementById('fileInput').addEventListener('change', function (event)
         });
     });
 
+    // Show the plot section
+    document.getElementById('plot-section').style.display = 'block';
+
     Plotly.newPlot('plot', traces, {
-        title: 'Elevation Profile',
-        // remove x axis 
+        title: '',  // Remove title as we have a section title now
         xaxis: { title: 'Distance (km)' },
         yaxis: { title: 'Elevation (m)', zeroline: false, range: [ylim_min, ylim_max] },
         annotations: annotations,
-        hovermode: 'closest'
+        hovermode: 'closest',
+        margin: { t: 30, r: 60, b: 100, l: 70 }  // Reduce top, increase bottom
     }, {
         displayModeBar: false,
         staticPlot: true
@@ -1237,6 +1240,14 @@ function calculateAdaptiveSegments(climb) {
 
 // Button
 document.getElementById('fileInput').addEventListener('change', function() {
-  const fileName = this.files.length ? this.files[0].name : 'No file selected.';
-  document.getElementById('file-name').textContent = fileName;
+  const fileNameElement = document.getElementById('file-name');
+  if (this.files.length) {
+    fileNameElement.textContent = `✓ ${this.files[0].name}`;
+    fileNameElement.style.color = 'var(--color-primary)';
+    fileNameElement.style.fontWeight = '600';
+  } else {
+    fileNameElement.textContent = 'No file selected';
+    fileNameElement.style.color = '';
+    fileNameElement.style.fontWeight = '';
+  }
 });

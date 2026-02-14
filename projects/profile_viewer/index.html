@@ -1,28 +1,57 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>GPX Elevation Plotter</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Climb Viewer - GPX Route Analysis</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 </head>
 <body>
 
-  <div class="main-content">
-    <h1>Climb Viewer</h1>
-    Unfortunately displaying average stats for each of the major climbs on the route is too much to ask for from Komoot.
-    Here you can visualize the profile of the route with all the climbs and their stats instantly, by just uploading the activity gpx.
-    <br>
+  <header class="header">
+    <div class="container">
+      <h1 class="logo">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 21l7-14 4 6 3-3 3 3"/>
+        </svg>
+        Climb Viewer
+      </h1>
+    </div>
+  </header>
 
-    <label for="fileInput" class="custom-file-upload">
-      Choose File
-    </label>
-    <input type="file" id="fileInput" accept=".gpx">
-    <p id="file-name">No file selected.</p>
+  <main class="container">
+    <section class="upload-section">
+      <div class="upload-card">
+        <h2>Upload Your Route</h2>
+        <p class="upload-description">
+          Get instant analysis of your cycling route with detailed climb profiles, 
+          gradient breakdowns, and power-based time estimates.
+        </p>
+        
+        <label for="fileInput" class="file-upload-button">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+          Choose GPX File
+        </label>
+        <input type="file" id="fileInput" accept=".gpx">
+        <p id="file-name" class="file-status">No file selected</p>
+      </div>
+    </section>
 
-  </div>
-  <div id="plot"></div>
-  <div id="climb-details"></div>
+    <section id="plot-section" class="plot-section" style="display: none;">
+      <h2 class="section-title">Route Elevation Profile</h2>
+      <div id="plot" class="elevation-plot"></div>
+    </section>
+
+    <section id="climb-details" class="climbs-section"></section>
+  </main>
 
   <script src="script.js"></script>
 </body>
