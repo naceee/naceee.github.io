@@ -257,7 +257,7 @@ input[type="file"] {
 .climb-plot {
   width: 100%;
   height: 400px;
-  margin: 24px 0 12px 0;
+  margin: 24px 0 0 0;
   border-radius: var(--radius-md);
   overflow: hidden;
 }
@@ -280,7 +280,7 @@ input[type="file"] {
 /* Mobile Responsive */
 @media (max-width: 768px) {
   .container {
-    padding: 0 16px;
+    padding: 0 12px;
   }
 
   .header {
@@ -288,79 +288,122 @@ input[type="file"] {
   }
 
   .logo {
-    font-size: 1.5rem;
+    font-size: 1.35rem;
+    gap: 8px;
+  }
+
+  .logo svg {
+    width: 28px;
+    height: 28px;
   }
 
   .tagline {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
   }
 
   .upload-section {
-    margin: 32px 0;
+    margin: 24px 0;
   }
 
   .upload-card {
-    padding: 32px 24px;
+    padding: 24px 16px;
+    border-radius: var(--radius-md);
   }
 
   .upload-card h2 {
-    font-size: 1.5rem;
+    font-size: 1.35rem;
   }
 
   .upload-description {
-    font-size: 0.9rem;
-  }
-
-  .file-upload-button {
-    padding: 14px 28px;
-    font-size: 0.95rem;
-  }
-
-  .section-title {
-    font-size: 1.25rem;
-  }
-
-  .elevation-plot {
-    height: 300px;
-    padding: 12px;
-  }
-
-  .climb-detail {
-    padding: 20px;
+    font-size: 0.85rem;
     margin-bottom: 24px;
   }
 
+  .file-upload-button {
+    padding: 14px 24px;
+    font-size: 0.95rem;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .section-title {
+    font-size: 1.15rem;
+    margin-bottom: 16px;
+  }
+
+  .plot-section {
+    margin: 32px 0;
+  }
+
+  .elevation-plot {
+    height: 350px;
+    padding: 4px;
+    border-radius: var(--radius-md);
+  }
+
+  .climbs-section {
+    margin: 32px 0 60px 0;
+  }
+
+  .climb-detail {
+    padding: 16px;
+    margin-bottom: 20px;
+    border-radius: var(--radius-md);
+  }
+
   .climb-header h3 {
-    font-size: 1.25rem;
+    font-size: 1.15rem;
+    margin-bottom: 12px;
   }
 
   .climb-stats {
-    gap: 8px;
+    gap: 6px;
+    margin-bottom: 12px;
   }
 
   .climb-stats span {
-    padding: 6px 12px;
-    font-size: 0.85rem;
+    padding: 6px 10px;
+    font-size: 0.8rem;
   }
 
   .climb-time-estimates {
-    gap: 8px;
+    gap: 6px;
+    padding-top: 12px;
+  }
+
+  .time-label {
+    font-size: 0.8rem;
+    width: 100%;
+    margin-bottom: 4px;
   }
 
   .time-estimate {
-    padding: 6px 12px;
-    font-size: 0.85rem;
+    padding: 6px 10px;
+    font-size: 0.8rem;
+    flex: 1;
+    text-align: center;
   }
 
   .climb-plot {
-    height: 300px;
+    height: 280px;
+    margin: 16px 0 0 0;
+    border-radius: var(--radius-sm);
+  }
+
+  .footer {
+    padding: 24px 0;
+  }
+
+  .footer p {
+    font-size: 0.8rem;
+    padding: 0 12px;
   }
 }
 
 /* Improve touch targets on mobile */
 @media (hover: none) and (pointer: coarse) {
   .file-upload-button {
-    padding: 18px 32px;
-    font-size: 1.05rem;
+    padding: 16px 28px;
+    font-size: 1rem;
   }
 }

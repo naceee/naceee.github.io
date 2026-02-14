@@ -121,13 +121,22 @@ document.getElementById('fileInput').addEventListener('change', function (event)
     // Show the plot section
     document.getElementById('plot-section').style.display = 'block';
 
+    // Adjust margins based on screen size
+    const isMobile = window.innerWidth <= 768;
+    const plotMargins = isMobile 
+        ? { t: 20, r: 25, b: 70, l: 50 }  // More bottom space for x-axis label
+        : { t: 40, r: 80, b: 90, l: 60 }; // Comfortable margins for desktop
+
+    if (isMobile) {
+        annotations = []; // Remove annotations on mobile for better readability
+    }
     Plotly.newPlot('plot', traces, {
         title: '',  // Remove title as we have a section title now
         xaxis: { title: 'Distance (km)' },
         yaxis: { title: 'Elevation (m)', zeroline: false, range: [ylim_min, ylim_max] },
         annotations: annotations,
         hovermode: 'closest',
-        margin: { t: 30, r: 60, b: 100, l: 70 }  // Reduce top, increase bottom
+        margin: plotMargins
     }, {
         displayModeBar: false,
         staticPlot: true
@@ -577,13 +586,12 @@ function createClimbDetailPlots(climbs) {
             <h3 id="climb-title-${climb.id}">${climb.name}</h3>
             <div class="climb-stats">
                 <span><strong>Length:</strong> ${climb.length} km</span>
-                <span><strong>Elevation Gain:</strong> ${Math.round(climb.elevationGain)} m</span>
-                <span><strong>Avg Gradient:</strong> ${climb.gradient}%</span>
-                <span><strong>Max Gradient:</strong> ${max100mGradient.toFixed(1)}%</span>
-                <span><strong>Distance to go:</strong> ${climb.toGo} km</span>
+                <span><strong>Elevation+:</strong> ${Math.round(climb.elevationGain)} m</span>
+                <span><strong>Gradient:</strong> ${climb.gradient.toFixed(1)}% (<strong>max:</strong> ${max100mGradient.toFixed(1)}%)</span>
+                <span><strong>To go:</strong> ${climb.toGo} km</span>
             </div>
             <div class="climb-time-estimates">
-                <span class="time-label">Estimated time @ 75kg:</span>
+                <span class="time-label">Estimated time:</span>
                 <span class="time-estimate time-2w">2 W/kg: ${timeEstimates.time2w}</span>
                 <span class="time-estimate time-3w">3 W/kg: ${timeEstimates.time3w}</span>
                 <span class="time-estimate time-4w">4 W/kg: ${timeEstimates.time4w}</span>
@@ -608,6 +616,12 @@ function createClimbDetailPlots(climbs) {
         const maxElev = Math.max(...climb.elevation);
         const yRangePadding = Math.min(100, (maxElev - minElev) * 0.1); // Add 10% padding or at least 100m
 
+        // Adjust margins based on screen size
+        const isMobile = window.innerWidth <= 768;
+        const climbPlotMargins = isMobile 
+            ? { t: 0, b: 30, l: 0, r: 0 }  // More bottom space for labels on mobile
+            : { t: 20, b: 20, l: 0, r: 0 }; // Standard margins for desktop
+
         const layout = {
             title: '',
             xaxis: { 
@@ -625,7 +639,7 @@ function createClimbDetailPlots(climbs) {
             },
             hovermode: 'closest',
             showlegend: false,
-            margin: { t: 20, b: 20, l: 20, r: 20 },
+            margin: climbPlotMargins,
             plot_bgcolor: 'white',
             paper_bgcolor: 'white'
         };
@@ -986,9 +1000,9 @@ function addSegmentLabels(plotId, segments, climb) {
         const isMobile = window.innerWidth <= 768;
         
         // Adjust font sizes based on device
-        const bottomLabelSize = isMobile ? 18 : 16;
-        const elevationLabelSize = isMobile ? 18 : 16;
-        const distanceLabelSize = isMobile ? 18 : 16;
+        const bottomLabelSize = isMobile ? 14 : 16;
+        const elevationLabelSize = isMobile ? 14 : 16;
+        const distanceLabelSize = isMobile ? 14 : 16;
         
         // Segment labels at the bottom
         segments.forEach((segment, idx) => {
@@ -999,7 +1013,12 @@ function addSegmentLabels(plotId, segments, climb) {
             const segmentStart = segment.distances[0];
             const segmentMid = segmentStart + segment.length / 2;
             // Format the label
-            const gradientText = segment.gradient.toFixed(1);
+            let gradientText;
+            if (!isMobile) {
+                gradientText = segment.gradient.toFixed(1);
+            } else {
+                gradientText = parseInt(segment.gradient.toFixed(0));
+            }
             const label = `${gradientText}%`;
             
             annotations.push({
@@ -1143,8 +1162,8 @@ function calculateAdaptiveSegments(climb) {
 
     
     // Adjust parameters based on device
-    const minSegmentLength = isMobile ? max(climb.length / 20, 0.1) * 2 : max(climb.length / 25, 0.1); // 250m on mobile, 100m on desktop
-    const gradientTolerance = isMobile ? 3 : 2; // More tolerance on mobile
+    const minSegmentLength = isMobile ? max(climb.length / 40, 0.1) * 2 : max(climb.length / 40, 0.1); // 250m on mobile, 100m on desktop
+    const gradientTolerance = isMobile ? 2.5 : 2; // More tolerance on mobile
     
     let i = 0;
     
