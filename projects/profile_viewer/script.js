@@ -118,9 +118,6 @@ document.getElementById('fileInput').addEventListener('change', function (event)
         });
     });
 
-    // Adjust annotation positions to prevent overlap
-    adjustAnnotationPositions(annotations);
-
     Plotly.newPlot('plot', traces, {
         title: 'Elevation Profile',
         // remove x axis 
@@ -131,6 +128,9 @@ document.getElementById('fileInput').addEventListener('change', function (event)
     }, {
         displayModeBar: false,
         staticPlot: true
+    }).then(() => {
+        // Adjust annotation positions after plot is rendered
+        adjustAnnotationPositions(annotations);
     });
 
     // Create detailed climb plots
@@ -197,89 +197,136 @@ function wrapAnnotationText(text, maxCharsPerLine = 20) {
 }
 
 
-function adjustAnnotationPositions(annotations) {
+async function adjustAnnotationPositions(annotations) {
     if (annotations.length === 0) return;
     
-    // Calculate total route length from annotations
-    const allX = annotations.map(ann => ann.x);
-    const totalLength = Math.max(...allX) - Math.min(...allX);
-    const overlapThreshold = totalLength * 0.1; // 10% of total length
+    const baseOffset = -50; // Base arrow offset (negative = above)
+    const padding = 10; // Extra padding between boxes
     
-    // Sort annotations by x position to process them left to right
+    // First, set all annotations to base position
+    annotations.forEach(ann => {
+        ann.ay = baseOffset;
+    });
+    
+    // Get the plot div
+    const plotDiv = document.getElementById('plot');
+    if (!plotDiv) return;
+    
+    // Helper function to get actual bounding box from DOM
+    function getActualBBox(annotationIndex) {
+        // Plotly creates annotation elements with specific structure
+        // The text box is in .annotation-text-g or similar
+        const annotationElements = plotDiv.querySelectorAll('.annotation-text');
+        
+        if (annotationIndex < annotationElements.length) {
+            const element = annotationElements[annotationIndex];
+            const rect = element.getBoundingClientRect();
+            const plotRect = plotDiv.getBoundingClientRect();
+            
+            // Convert to plot-relative coordinates
+            return {
+                left: rect.left - plotRect.left,
+                right: rect.right - plotRect.left,
+                top: rect.top - plotRect.top,
+                bottom: rect.bottom - plotRect.top,
+                width: rect.width,
+                height: rect.height
+            };
+        }
+        
+        // Fallback: try to find by other selectors
+        const allAnnotations = plotDiv.querySelectorAll('g.annotation');
+        if (annotationIndex < allAnnotations.length) {
+            const annotationGroup = allAnnotations[annotationIndex];
+            // Look for the text element specifically (not the line/arrow)
+            const textElement = annotationGroup.querySelector('text');
+            
+            if (textElement) {
+                const rect = textElement.getBoundingClientRect();
+                const plotRect = plotDiv.getBoundingClientRect();
+                
+                // Get the background rectangle if it exists
+                const bgRect = annotationGroup.querySelector('rect');
+                if (bgRect) {
+                    const bgBox = bgRect.getBoundingClientRect();
+                    return {
+                        left: bgBox.left - plotRect.left,
+                        right: bgBox.right - plotRect.left,
+                        top: bgBox.top - plotRect.top,
+                        bottom: bgBox.bottom - plotRect.top,
+                        width: bgBox.width,
+                        height: bgBox.height
+                    };
+                }
+                
+                // Fallback to text element bounds
+                return {
+                    left: rect.left - plotRect.left,
+                    right: rect.right - plotRect.left,
+                    top: rect.top - plotRect.top,
+                    bottom: rect.bottom - plotRect.top,
+                    width: rect.width,
+                    height: rect.height
+                };
+            }
+        }
+        
+        return null;
+    }
+    
+    // Helper function to check if two bounding boxes overlap
+    function boxesOverlap(box1, box2) {
+        if (!box1 || !box2) return false;
+        return !(box1.right + padding < box2.left || 
+                 box1.left - padding > box2.right || 
+                 box1.bottom + padding < box2.top || 
+                 box1.top - padding > box2.bottom);
+    }
+    
+    // Sort annotations by x position (left to right)
     const sortedIndices = annotations
         .map((ann, idx) => ({ idx, x: ann.x }))
         .sort((a, b) => a.x - b.x);
     
-    // Calculate vertical positions to avoid overlap
-    const positions = [];
-
-    const minVerticalSpacing = 15; // Minimum pixels between annotation boxes
-    const baseOffset = -50; // Base arrow offset (negative = above)
+    // Process from left to right, adjusting each annotation if it overlaps with the previous one
+    // We need to do this iteratively because moving one annotation might require re-checking
+    let maxIterations = 10;
+    let iteration = 0;
+    let madeChanges = true;
     
-    sortedIndices.forEach((item, i) => {
-        const ann = annotations[item.idx];
-        const currentX = ann.x;
+    while (madeChanges && iteration < maxIterations) {
+        madeChanges = false;
+        iteration++;
         
-        // Start with the base offset (above the climb)
-        let targetOffset = baseOffset;
-        
-        // Check against previous annotations for overlap
-        for (let j = 0; j < i; j++) {
-            const prevItem = sortedIndices[j];
-            const prevAnn = annotations[prevItem.idx];
-            const prevX = prevAnn.x;
-            
-            // Calculate horizontal distance
-            const horizontalDistance = Math.abs(currentX - prevX);
-            
-            // If annotations are close horizontally, adjust vertical position
-            if (horizontalDistance < overlapThreshold) {
-                const prevOffset = positions[j] || baseOffset;
-                
-                // Calculate how much overlap there might be based on distance
-                const overlapFactor = Math.max(0, (overlapThreshold - horizontalDistance) / overlapThreshold);
-                const verticalAdjustment = minVerticalSpacing * overlapFactor;
-                
-                // Move further up if too close
-                if (horizontalDistance < overlapThreshold * 0.3) {
-                    // Very close: stack them further up
-                    targetOffset = prevOffset - minVerticalSpacing;
-                } else {
-                    // Moderately close: move up proportionally
-                    targetOffset = Math.min(targetOffset, prevOffset - verticalAdjustment);
-                }
-            }
+        // Update the plot to get new bounding boxes after any changes
+        if (iteration > 1) {
+            await Plotly.relayout('plot', { annotations: annotations });
+            // Small delay to let DOM fully update
+            await new Promise(resolve => setTimeout(resolve, 50));
         }
         
-        // Ensure we never go below the base offset (always keep arrows above)
-        targetOffset = Math.min(targetOffset, baseOffset);
-        
-        // Apply the calculated offset
-        ann.ay = targetOffset;
-        positions.push(targetOffset);
-    });
-    
-    // Second pass: ensure no two annotations have overlapping boxes
-    for (let i = 1; i < sortedIndices.length; i++) {
-        const currentItem = sortedIndices[i];
-        const currentAnn = annotations[currentItem.idx];
-        
-        for (let j = 0; j < i; j++) {
-            const prevItem = sortedIndices[j];
-            const prevAnn = annotations[prevItem.idx];
+        for (let i = 1; i < sortedIndices.length; i++) {
+            const prevIdx = sortedIndices[i - 1].idx;
+            const currIdx = sortedIndices[i].idx;
+            const prevAnn = annotations[prevIdx];
+            const currAnn = annotations[currIdx];
             
-            const xDist = Math.abs(currentAnn.x - prevAnn.x);
+            // Get actual bounding boxes from DOM
+            const prevBox = getActualBBox(prevIdx);
+            const currBox = getActualBBox(currIdx);
             
-            // If very close horizontally, make sure they're well separated vertically
-            if (xDist < overlapThreshold * 0.5) {
-                const currentY = currentAnn.y + (currentAnn.ay || baseOffset) / 5;
-                const prevY = prevAnn.y + (prevAnn.ay || baseOffset) / 5;
+            // If they overlap, move current annotation up
+            if (boxesOverlap(prevBox, currBox)) {
+                madeChanges = true;
                 
-                // If too close vertically, push current one further up
-                if (Math.abs(currentY - prevY) < 120) {
-                    // Always move up (more negative)
-                    currentAnn.ay = Math.min(currentAnn.ay, prevAnn.ay - minVerticalSpacing * 1.5);
-                }
+                // Calculate how much to move up to clear the overlap
+                const overlapAmount = currBox.bottom - prevBox.top + padding;
+                
+                // Move current annotation up
+                currAnn.ay = (currAnn.ay || baseOffset) - overlapAmount;
+                
+                // Ensure we don't go too far (reasonable limit)
+                currAnn.ay = Math.max(currAnn.ay, -400);
             }
         }
     }
@@ -722,7 +769,7 @@ async function fetchClimbNames(displayedClimbs, allClimbs) {
 }
 
 
-function updateMainPlotAnnotation(annotationIndex, climb) {
+async function updateMainPlotAnnotation(annotationIndex, climb) {
     // Get the current plot
     const plotDiv = document.getElementById('plot');
     if (!plotDiv || !plotDiv.layout || !plotDiv.layout.annotations) {
@@ -741,12 +788,12 @@ function updateMainPlotAnnotation(annotationIndex, climb) {
         text = wrapAnnotationText(text, 20);
         
         annotations[annotationIndex].text = text;
-
-        // Adjust annotation positions to prevent overlap
-        adjustAnnotationPositions(annotations);
         
         // Update the plot with the new annotations
-        Plotly.relayout('plot', { annotations: annotations });
+        await Plotly.relayout('plot', { annotations: annotations });
+
+        // Adjust annotation positions to prevent overlap (after DOM updates)
+        await adjustAnnotationPositions(annotations);
     }
 }
 
