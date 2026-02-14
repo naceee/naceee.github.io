@@ -464,6 +464,9 @@ function createClimbDetailPlots(climbs) {
         // Calculate max 100m gradient
         const max100mGradient = calculateMax100mGradient(climb);
         
+        // Calculate estimated times for different power outputs
+        const timeEstimates = calculateClimbingTime(climb);
+        
         // Create container for this climb
         const climbDiv = document.createElement('div');
         climbDiv.className = 'climb-detail';
@@ -480,6 +483,12 @@ function createClimbDetailPlots(climbs) {
                 <span><strong>Avg Gradient:</strong> ${climb.gradient}%</span>
                 <span><strong>Max Gradient:</strong> ${max100mGradient.toFixed(1)}%</span>
                 <span><strong>Distance to go:</strong> ${climb.toGo} km</span>
+            </div>
+            <div class="climb-time-estimates">
+                <span class="time-label">Estimated time:</span>
+                <span class="time-estimate time-2w">2 W/kg: ${timeEstimates.time2w}</span>
+                <span class="time-estimate time-3w">3 W/kg: ${timeEstimates.time3w}</span>
+                <span class="time-estimate time-4w">4 W/kg: ${timeEstimates.time4w}</span>
             </div>
         `;
         climbDiv.appendChild(header);
@@ -559,6 +568,74 @@ function calculateMax100mGradient(climb) {
     }
     
     return maxGradient;
+}
+
+
+function calculateClimbingTime(climb) {
+    // Constants
+    const riderMass = 75; // kg
+    const bikeMass = 10; // kg  
+    const totalMass = riderMass + bikeMass;
+    const g = 9.81; // gravity m/s^2
+    const Crr = 0.004; // rolling resistance coefficient
+    const CdA = 0.35; // drag coefficient * frontal area (m^2)
+    const rho = 1.225; // air density kg/m^3
+    const drivetrain = 0.97; // drivetrain efficiency
+    
+    // Climb parameters
+    const distance = climb.length * 1000; // convert km to meters
+    const gradient = climb.gradient / 100; // convert percentage to decimal
+    
+    // Calculate for each power level
+    const powerLevels = [2, 3, 4]; // W/kg
+    const times = {};
+    
+    powerLevels.forEach(wkg => {
+        const power = wkg * riderMass; // total watts
+        const effectivePower = power * drivetrain; // after drivetrain losses
+        
+        // For climbing, we'll use a simplified model
+        // Assume relatively low speed where air resistance is minimal
+        // Main forces: gravity and rolling resistance
+        
+        // Use iterative approach to find speed
+        // Start with estimate based on power and gradient
+        let speed = 5; // m/s initial guess (18 km/h)
+        
+        // Iterate to find equilibrium speed
+        for (let iter = 0; iter < 10; iter++) {
+            // Forces
+            const gravityForce = totalMass * g * Math.sin(Math.atan(gradient));
+            const rollingForce = totalMass * g * Math.cos(Math.atan(gradient)) * Crr;
+            const dragForce = 0.5 * CdA * rho * speed * speed;
+            
+            const totalForce = gravityForce + rollingForce + dragForce;
+            
+            // Speed from power balance: Power = Force * Velocity
+            speed = effectivePower / totalForce;
+            
+            // Limit speed to reasonable range
+            speed = Math.max(1, Math.min(15, speed));
+        }
+        
+        // Calculate time
+        const timeSeconds = distance / speed;
+        const timeMinutes = Math.round(timeSeconds / 60);
+        
+        // Format time as HH:MM or MM:SS
+        let timeString;
+        if (timeMinutes >= 60) {
+            const hours = Math.floor(timeMinutes / 60);
+            const mins = timeMinutes % 60;
+            timeString = `${hours}h ${mins}m`;
+        } else {
+            timeString = `${timeMinutes}m`;
+        }
+        
+        times[`time${wkg}w`] = timeString;
+    });
+    
+    return times;
 }
 
 
