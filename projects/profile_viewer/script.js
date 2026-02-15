@@ -30,6 +30,7 @@ document.getElementById('fileInput').addEventListener('change', function (event)
     for (let i = 0; i < climbs.length; i++) {
         console.log(climbs[i])
     }
+    const isMobile = window.innerWidth <= 768;
 
     // Build annotations for climbs
     let annotations = climbs.map(climb => {
@@ -39,12 +40,21 @@ document.getElementById('fileInput').addEventListener('change', function (event)
         let topElev = climb.elevation[topIndex];
 
         let text;
-        if (climb.category === 'hupser' || climb.category === 'uncategorized') {
-            text = `${climb.length}km<br>${climb.gradient}%`;
+        if (!(isMobile)) {
+            if (climb.category === 'hupser' || climb.category === 'uncategorized') {
+                text = `${climb.length}km<br>${climb.gradient}%`;
+            } else {
+                text = `${climb.name}<br>${climb.length}km<br>${climb.gradient}%`;
+            }
         } else {
-            text = `${climb.name}<br>${climb.length}km<br>${climb.gradient}%`;
+            text = `${climb.length}km<br>${climb.gradient}%`;
         }
-        
+
+        if (text === undefined) {
+            // Skip annotation for this climb if no text is set (e.g., on mobile for hupser/uncategorized)
+            return null;
+        }
+
         // Wrap text to prevent long lines
         text = wrapAnnotationText(text, 20);
         
@@ -122,14 +132,10 @@ document.getElementById('fileInput').addEventListener('change', function (event)
     document.getElementById('plot-section').style.display = 'block';
 
     // Adjust margins based on screen size
-    const isMobile = window.innerWidth <= 768;
     const plotMargins = isMobile 
         ? { t: 20, r: 25, b: 70, l: 50 }  // More bottom space for x-axis label
         : { t: 40, r: 80, b: 90, l: 60 }; // Comfortable margins for desktop
 
-    if (isMobile) {
-        annotations = []; // Remove annotations on mobile for better readability
-    }
     Plotly.newPlot('plot', traces, {
         title: '',  // Remove title as we have a section title now
         xaxis: { title: 'Distance (km)' },
@@ -147,6 +153,9 @@ document.getElementById('fileInput').addEventListener('change', function (event)
 
     // Create detailed climb plots
     createClimbDetailPlots(climbs);
+    
+    // Store climbs data globally for download function
+    window.currentClimbsData = climbs.filter(climb => climb.category !== 'hupser' && climb.category !== 'uncategorized');
   };
 
   reader.readAsText(file);
@@ -302,14 +311,15 @@ async function adjustAnnotationPositions(annotations) {
     
     // Process from left to right, adjusting each annotation if it overlaps with the previous one
     // We need to do this iteratively because moving one annotation might require re-checking
-    let maxIterations = 10;
+    let maxIterations = 5;
     let iteration = 0;
     let madeChanges = true;
     
     while (madeChanges && iteration < maxIterations) {
         madeChanges = false;
         iteration++;
-        
+        console.log(`Annotation adjustment iteration ${iteration}`);
+
         // Update the plot to get new bounding boxes after any changes
         if (iteration > 1) {
             await Plotly.relayout('plot', { annotations: annotations });
@@ -570,6 +580,7 @@ function createClimbDetailPlots(climbs) {
     displayedClimbs.forEach((climb, displayIndex) => {
         // Calculate max 100m gradient
         const max100mGradient = calculateMax100mGradient(climb);
+        climb.maxGradient = max100mGradient; // Store for download
         
         // Calculate estimated times for different power outputs
         const timeEstimates = calculateClimbingTime(climb);
@@ -800,16 +811,21 @@ function updateMainPlotAnnotationTextOnly(annotationIndex, climb) {
     }
     
     const annotations = plotDiv.layout.annotations;
+    const isMobile = window.innerWidth <= 768;
     
     // The annotations array corresponds directly to allClimbs array
     // So we can use annotationIndex directly
     if (annotationIndex < annotations.length) {
         // Update the annotation text with the new name
-        let text = `${climb.name}<br>${climb.length}km<br>${climb.gradient}%`;
-        
-        // Wrap text to prevent long lines
-        text = wrapAnnotationText(text, 20);
-        
+        let text;
+        if (isMobile) {
+            // On mobile, we only show length and gradient to save space
+            text = `${climb.length}km<br>${climb.gradient}%`;
+        } else {
+            text = `${climb.name}<br>${climb.length}km<br>${climb.gradient}%`;                
+            // Wrap text to prevent long lines
+            text = wrapAnnotationText(text, 20);
+        }
         annotations[annotationIndex].text = text;
         
         // Update the plot with the new annotations (but don't adjust positions)
@@ -1268,5 +1284,183 @@ document.getElementById('fileInput').addEventListener('change', function() {
     fileNameElement.textContent = 'No file selected';
     fileNameElement.style.color = '';
     fileNameElement.style.fontWeight = '';
+  }
+});
+
+
+// Download plots functionality
+document.getElementById('download-plots-btn').addEventListener('click', async function() {
+  const button = this;
+  const originalText = button.innerHTML;
+  
+  // Show loading state
+  button.disabled = true;
+  button.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg> Generating...';
+  
+  try {
+    // Get stored climb data
+    const climbs = window.currentClimbsData || [];
+    
+    // Get GPX filename
+    const fileInput = document.getElementById('fileInput');
+    const fileName = fileInput.files[0] ? fileInput.files[0].name.replace('.gpx', '') : 'Route';
+    
+    // Calculate total canvas height
+    const headerHeight = 100;
+    const mainPlotHeight = 800; // 100 title + 700 plot
+    const climbPlotHeight = 800; // 80 header + 100 stats + 600 plot + 20 margin
+    const totalHeight = headerHeight + mainPlotHeight + (climbs.length * climbPlotHeight) + 50;
+    
+    // Create main canvas
+    const canvas = document.createElement('canvas');
+    canvas.width = 1400;
+    canvas.height = totalHeight;
+    const ctx = canvas.getContext('2d');
+    
+    // Fill background
+    ctx.fillStyle = '#f8f9fa';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // Draw main header
+    ctx.fillStyle = '#2d6a4f';
+    ctx.fillRect(0, 0, canvas.width, headerHeight);
+    
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 48px Arial, sans-serif';
+    ctx.fillText(fileName, 40, 70);
+    
+    let yPosition = headerHeight + 20;
+    
+    // Draw main plot title
+    ctx.fillStyle = '#212529';
+    ctx.font = 'bold 28px Arial, sans-serif';
+    ctx.fillText('Route Elevation Profile', 40, yPosition + 35);
+    
+    yPosition += 80;
+    
+    // Get and draw main elevation profile
+    const mainImgData = await Plotly.toImage('plot', {
+      format: 'png',
+      width: 1400,
+      height: 700
+    });
+    
+    const mainImg = new Image();
+    await new Promise((resolve, reject) => {
+      mainImg.onload = resolve;
+      mainImg.onerror = reject;
+      mainImg.src = mainImgData;
+    });
+    
+    ctx.drawImage(mainImg, 0, yPosition, 1400, 700);
+    yPosition += 720;
+    
+    // Draw each climb plot with stats
+    for (let i = 0; i < climbs.length; i++) {
+      const climb = climbs[i];
+      const plotDiv = document.getElementById(`climb-plot-${i}`);
+      
+      if (plotDiv) {
+        // White background for this climb section
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, yPosition, canvas.width, climbPlotHeight - 20);
+        
+        // Draw climb header bar
+        ctx.fillStyle = '#2d6a4f';
+        ctx.fillRect(0, yPosition, canvas.width, 80);
+        
+        // Draw climb name
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 32px Arial, sans-serif';
+        ctx.fillText(climb.name || `Climb ${i + 1}`, 30, yPosition + 50);
+        
+        yPosition += 80;
+        
+        // Draw stats boxes
+        const stats = [
+          { label: 'Length', value: `${climb.length} km` },
+          { label: 'Elevation Gain', value: `${Math.round(climb.elevationGain)} m` },
+          { label: 'Avg Gradient', value: `${climb.gradient}%` },
+          { label: 'Max Gradient', value: `${climb.maxGradient ? climb.maxGradient.toFixed(1) : 'N/A'}%` },
+        ];
+        
+        let xPos = 30;
+        
+        stats.forEach(stat => {
+          // Background box
+          ctx.fillStyle = '#f8f9fa';
+          ctx.fillRect(xPos, yPosition + 10, 260, 80);
+          
+          // Label
+          ctx.fillStyle = '#6c757d';
+          ctx.font = 'bold 14px Arial, sans-serif';
+          ctx.fillText(stat.label, xPos + 15, yPosition + 35);
+          
+          // Value
+          ctx.fillStyle = '#212529';
+          ctx.font = 'bold 24px Arial, sans-serif';
+          ctx.fillText(stat.value, xPos + 15, yPosition + 70);
+          
+          xPos += 270;
+        });
+        
+        yPosition += 110;
+        
+        // Get and draw climb plot
+        const climbImgData = await Plotly.toImage(plotDiv, {
+          format: 'png',
+          width: 1400,
+          height: 600
+        });
+        
+        const climbImg = new Image();
+        await new Promise((resolve, reject) => {
+          climbImg.onload = resolve;
+          climbImg.onerror = reject;
+          climbImg.src = climbImgData;
+        });
+        
+        ctx.drawImage(climbImg, 0, yPosition, 1400, 600);
+        yPosition += 620;
+        
+        // Small delay for smoother rendering
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+    }
+    
+    // Add footer
+    ctx.fillStyle = '#6c757d';
+    ctx.font = '16px Arial, sans-serif';
+    ctx.fillText('Generated by Climb Viewer • Powered by OpenStreetMap', 40, yPosition + 30);
+    
+    // Convert canvas to blob and download
+    const safeFileName = fileName.replace(/[^a-z0-9]/gi, '-').toLowerCase();
+    
+    canvas.toBlob(blob => {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${safeFileName}-complete-analysis.png`;
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+    
+    // Success state
+    button.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Downloaded!';
+    
+    // Reset button after 2 seconds
+    setTimeout(() => {
+      button.innerHTML = originalText;
+      button.disabled = false;
+    }, 2000);
+    
+  } catch (error) {
+    console.error('Download error:', error);
+    button.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> Error';
+    
+    setTimeout(() => {
+      button.innerHTML = originalText;
+      button.disabled = false;
+    }, 2000);
   }
 });

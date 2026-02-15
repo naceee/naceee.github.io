@@ -131,14 +131,51 @@ input[type="file"] {
 }
 
 /* Section Titles */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
 .section-title {
   font-size: 1.5rem;
   font-weight: 700;
   color: var(--color-text);
-  margin: 0 0 24px 0;
+  margin: 0;
   padding-bottom: 12px;
   border-bottom: 3px solid var(--color-primary);
   display: inline-block;
+}
+
+.download-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--color-surface);
+  color: var(--color-primary);
+  padding: 10px 20px;
+  border-radius: var(--radius-md);
+  border: 2px solid var(--color-primary);
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.download-button:hover {
+  background: var(--color-primary);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.download-button svg {
+  width: 18px;
+  height: 18px;
 }
 
 /* Plot Section */
@@ -329,6 +366,17 @@ input[type="file"] {
   .section-title {
     font-size: 1.15rem;
     margin-bottom: 16px;
+  }
+
+  .section-header {
+    margin-bottom: 16px;
+  }
+
+  .download-button {
+    padding: 10px 16px;
+    font-size: 0.85rem;
+    width: 100%;
+    justify-content: center;
   }
 
   .plot-section {
