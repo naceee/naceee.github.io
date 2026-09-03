@@ -131,7 +131,6 @@ function buildHintPool(rider) {
   }
 
   if (rider.height) personal.push(makeHint("Personal file", "personal", "Height", `${rider.height.toFixed(2)} m`, "profile measurement"));
-  personal.push(makeHint("Personal file", "personal", "Age this season", rider.age, "age on the team roster"));
   if (rider.birthYear) personal.push(makeHint("Personal file", "personal", "Year of birth", rider.birthYear, rider.dateOfBirth || ""));
 
   const oldTeams = (rider.teamHistory || [])
