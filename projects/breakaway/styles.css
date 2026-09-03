@@ -281,7 +281,14 @@ main { overflow: clip; }
 
 .evidence-section { background: #e8e5dc; border: 1px solid var(--ink); padding: 24px; min-height: 520px; }
 .section-heading { display: block; margin-bottom: 20px; }
-.evidence-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 14px; align-items: start; }
+.evidence-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  grid-auto-flow: dense;
+  grid-auto-rows: 4px;
+  gap: 14px;
+  align-items: start;
+}
 .empty-state {
   grid-column: 1 / -1;
   min-height: 260px;
@@ -334,11 +341,24 @@ main { overflow: clip; }
 .bar-item:nth-child(5) { --bar: var(--green); }
 .bar-item:nth-child(6) { --bar: var(--pink); }
 
-.ranking-list { display: flex; align-items: end; gap: 8px; min-height: 125px; padding-top: 14px; overflow-x: auto; }
+.ranking-summary {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 18px;
+  padding-top: 11px;
+  color: var(--muted);
+  font: 700 .58rem ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: .04em;
+}
+.ranking-list { display: flex; align-items: end; gap: 8px; min-height: 125px; padding-top: 8px; overflow-x: auto; }
 .ranking-column { min-width: 45px; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: end; gap: 7px; }
 .ranking-column strong { font: 700 .61rem ui-monospace, SFMono-Regular, Menlo, monospace; }
 .ranking-bar { width: 100%; min-height: 5px; height: var(--height); max-height: 82px; background: var(--sky); border: 1px solid var(--ink); animation: grow-up .6s ease both; transform-origin: bottom; }
 .ranking-column span { font-size: .61rem; color: var(--muted); }
+.ranking-column.is-empty .ranking-bar { height: 5px; border-style: dashed; border-color: #c6c8c4; background: transparent; animation: none; }
+.ranking-column.is-live { min-width: 58px; }
+.ranking-column.is-live span { color: var(--orange); font-weight: 800; }
 @keyframes grow-up { from { transform: scaleY(0); } }
 .result-chip { display: inline-flex; gap: 8px; margin: 12px 8px 0 0; padding: 8px 10px; border: 1px solid var(--ink); background: white; font-size: .72rem; }
 .result-chip b { color: var(--orange); }

@@ -68,6 +68,11 @@ const getStat = (rider, label) => rider.keyStats?.find((item) => item.label === 
 
 function makeHint(category, type, title, value, detail = "", draw = {}) {
   const profile = DRAW_PROFILES[type] || DRAW_PROFILES.personal;
+  const {
+    weight = profile.weight,
+    difficulty = profile.difficulty,
+    ...metadata
+  } = draw;
   return {
     id: crypto.randomUUID(),
     category,
@@ -75,9 +80,45 @@ function makeHint(category, type, title, value, detail = "", draw = {}) {
     title,
     value,
     detail,
-    weight: draw.weight ?? profile.weight,
-    difficulty: draw.difficulty ?? profile.difficulty,
+    weight,
+    difficulty,
+    ...metadata,
   };
+}
+
+function getCareerSeasons(rider, seasonRanks) {
+  const knownSeasons = [
+    ...seasonRanks.map((rank) => rank.season),
+    ...(rider.teamHistory || []).map((team) => team.season),
+    ...(rider.topResults || []).map((result) => result.year),
+  ].filter((season) => Number.isInteger(season) && season <= DATA_SEASON);
+  const firstSeason = Math.min(...knownSeasons, DATA_SEASON);
+  return Array.from({ length: DATA_SEASON - firstSeason + 1 }, (_, index) => firstSeason + index);
+}
+
+function buildRankingHints(rider, seasonRanks) {
+  if (!seasonRanks.length) return [];
+
+  const stageCount = seasonRanks.length >= 6 ? 3 : seasonRanks.length >= 2 ? 2 : 1;
+  const careerSeasons = getCareerSeasons(rider, seasonRanks);
+  const hints = [];
+  let revealedCount = 0;
+
+  for (let stage = 1; stage <= stageCount; stage += 1) {
+    const nextCount = Math.ceil((seasonRanks.length * stage) / stageCount);
+    const newlyRevealed = seasonRanks.slice(revealedCount, nextCount);
+    revealedCount = nextCount;
+    hints.push(makeHint(
+      "Season rankings",
+      "ranking",
+      `Career ranking reveal ${stage} of ${stageCount}`,
+      newlyRevealed,
+      `${revealedCount} of ${seasonRanks.length} completed rankings revealed`,
+      { rankingStage: stage, rankingStageCount: stageCount, careerSeasons },
+    ));
+  }
+
+  return hints;
 }
 
 function buildHintPool(rider) {
@@ -95,13 +136,7 @@ function buildHintPool(rider) {
   const seasonRanks = [...(rider.rankings || [])]
     .filter((rank) => rank.season < DATA_SEASON)
     .sort((a, b) => a.season - b.season);
-  const rankBatchSize = seasonRanks.length > 8 ? 3 : Math.max(2, Math.ceil(seasonRanks.length / 2));
-  for (let index = 0; index < seasonRanks.length; index += rankBatchSize) {
-    const batch = seasonRanks.slice(index, index + rankBatchSize);
-    if (!batch.length) continue;
-    const span = batch.length === 1 ? `${batch[0].season} season` : `${batch[0].season}–${batch.at(-1).season} seasons`;
-    middle.push(makeHint("Season rankings", "ranking", span, batch, `${batch.length} seasons revealed together`));
-  }
+  middle.push(...buildRankingHints(rider, seasonRanks));
 
   for (const label of ["Classics", "Grand tours", "Wins"]) {
     const stat = getStat(rider, label);
@@ -196,15 +231,24 @@ function weightedChoice(candidates, roundNumber) {
 }
 
 function buildHintRounds(pool) {
-  const remaining = [...pool];
-  const usableHintCount = Math.min(remaining.length, MAX_POOL_HINTS);
-  const threeHintRounds = Math.max(0, usableHintCount - MIN_POOL_HINTS);
+  const rankingHints = pool
+    .filter((hint) => hint.type === "ranking")
+    .sort((a, b) => a.rankingStage - b.rankingStage);
+  const remaining = pool.filter((hint) => hint.type !== "ranking");
+  const totalHintCount = Math.min(pool.length, MAX_POOL_HINTS);
+  const threeHintRounds = Math.max(0, totalHintCount - MIN_POOL_HINTS);
   const batchSizes = shuffled([
     ...Array(threeHintRounds).fill(3),
     ...Array(MAX_ROUNDS - threeHintRounds).fill(2),
   ]);
+  const rankingRounds = rankingHints.map((_, index) => {
+    if (rankingHints.length === 1) return 0;
+    return Math.round((index * (MAX_ROUNDS - 1)) / (rankingHints.length - 1));
+  });
   return batchSizes.map((batchSize, roundIndex) => {
-    const picked = [];
+    const picked = rankingHints
+      .filter((_, index) => rankingRounds[index] === roundIndex)
+      .map((hint) => ({ ...hint, round: roundIndex + 1 }));
     while (picked.length < batchSize && remaining.length) {
       const usedCategories = new Set(picked.map((hint) => hint.category));
       const diverseCandidates = remaining.filter((hint) => !usedCategories.has(hint.category));
@@ -311,13 +355,14 @@ function renderEvidence() {
     : visible.reduce((all, hint) => ((all[hint.category] ||= []).push(hint), all), {});
 
   el.evidence.innerHTML = Object.entries(groups).map(([category, hints]) => renderCard(category, hints)).join("");
+  scheduleEvidenceLayout();
 }
 
 function renderCard(category, hints) {
   const [label, className] = categoryMeta[category] || [category.toUpperCase(), ""];
   const latestRound = Math.max(...hints.map((hint) => hint.round));
   return `
-    <article class="evidence-card ${className}">
+    <article class="evidence-card ${className}" data-category="${escapeHtml(category)}">
       <div class="card-header"><h3>${escapeHtml(label)}</h3><span>UPDATED R${String(latestRound).padStart(2, "0")}</span></div>
       ${renderCardBody(category, hints)}
     </article>`;
@@ -331,11 +376,42 @@ function renderCardBody(category, hints) {
     `).join("")}</div>`;
   }
   if (category === "Season rankings") {
-    const ranks = hints.flatMap((hint) => Array.isArray(hint.value) ? hint.value : [hint.value]).filter((value) => value && typeof value === "object");
-    const maxPoints = Math.max(...ranks.map((rank) => rank.points), 1);
-    return `<div class="ranking-list">${ranks.map((rank) => `
-      <div class="ranking-column"><strong>#${rank.rank ?? "—"}</strong><div class="ranking-bar" style="--height:${Math.max(5, (rank.points / maxPoints) * 105)}px"></div><span>${rank.season}</span></div>
-    `).join("")}</div>`;
+    const revealedRanks = hints
+      .flatMap((hint) => Array.isArray(hint.value) ? hint.value : [hint.value])
+      .filter((value) => value && typeof value === "object")
+      .sort((a, b) => a.season - b.season);
+    const allRanks = [...(state.answer.rankings || [])]
+      .filter((rank) => rank.season < DATA_SEASON)
+      .sort((a, b) => a.season - b.season);
+    const careerSeasons = hints[0].careerSeasons || allRanks.map((rank) => rank.season);
+    const revealedBySeason = new Map(revealedRanks.map((rank) => [rank.season, rank]));
+    const allBySeason = new Map(allRanks.map((rank) => [rank.season, rank]));
+    const maxPoints = Math.max(...allRanks.map((rank) => rank.points), 1);
+    const isComplete = hints.some((hint) => hint.rankingStage === hint.rankingStageCount);
+    const firstSeason = careerSeasons[0];
+    const lastSeason = careerSeasons.at(-1);
+    return `
+      <div class="ranking-summary">
+        <span>CAREER ${firstSeason}–${lastSeason}</span>
+        <span>${revealedRanks.length} / ${allRanks.length} COMPLETED RANKINGS SHOWN</span>
+      </div>
+      <div class="ranking-list">${careerSeasons.map((season) => {
+        const rank = revealedBySeason.get(season);
+        const hasCompletedRank = allBySeason.has(season);
+        const isLive = season === DATA_SEASON;
+        const emptyLabel = isComplete && !hasCompletedRank && !isLive ? "—" : "&nbsp;";
+        const ariaLabel = rank
+          ? `${season}: rank ${rank.rank}, ${rank.points} points`
+          : isLive
+            ? `${season}: current season, ranking not included`
+            : `${season}: ${isComplete && !hasCompletedRank ? "no completed ranking" : "ranking not revealed yet"}`;
+        return `
+          <div class="ranking-column ${rank ? "is-revealed" : "is-empty"} ${isLive ? "is-live" : ""}" aria-label="${escapeHtml(ariaLabel)}">
+            <strong>${rank ? `#${rank.rank ?? "—"}` : emptyLabel}</strong>
+            <div class="ranking-bar" style="--height:${rank ? Math.max(5, (rank.points / maxPoints) * 105) : 0}px"></div>
+            <span>${season}${isLive ? " · LIVE" : ""}</span>
+          </div>`;
+      }).join("")}</div>`;
   }
   if (category === "Selected results") {
     return `<div>${hints.map((hint) => `<span class="result-chip"><b>${escapeHtml(String(hint.value))}</b>${escapeHtml(hint.title)}${hint.detail ? ` · ${escapeHtml(hint.detail)}` : ""}</span>`).join("")}</div>`;
@@ -344,8 +420,54 @@ function renderCardBody(category, hints) {
     return `<div>${hints.map((hint) => `<span class="badge-chip">◆ ${escapeHtml(hint.title)}</span>`).join("")}</div>`;
   }
   return `<ul class="clue-list">${hints.map((hint) => {
-    return `<li class="clue-row"><span class="clue-index">R${hint.round}</span><div><strong>${escapeHtml(hint.title)} — ${escapeHtml(String(hint.value))}</strong>${hint.detail ? `<p>${escapeHtml(hint.detail)}</p>` : ""}</div></li>`;
+    const showDetail = category !== "Personal file" && hint.detail;
+    return `<li class="clue-row"><span class="clue-index">R${hint.round}</span><div><strong>${escapeHtml(hint.title)} — ${escapeHtml(String(hint.value))}</strong>${showDetail ? `<p>${escapeHtml(hint.detail)}</p>` : ""}</div></li>`;
   }).join("")}</ul>`;
+}
+
+let evidenceLayoutFrame = null;
+
+function scheduleEvidenceLayout() {
+  if (evidenceLayoutFrame) cancelAnimationFrame(evidenceLayoutFrame);
+  evidenceLayoutFrame = requestAnimationFrame(() => {
+    evidenceLayoutFrame = null;
+    const styles = getComputedStyle(el.evidence);
+    const rowHeight = Number.parseFloat(styles.gridAutoRows) || 1;
+    const rowGap = Number.parseFloat(styles.rowGap) || 0;
+    const cards = [...el.evidence.querySelectorAll(".evidence-card")];
+    cards.forEach((card) => {
+      card.style.gridRowEnd = "auto";
+      card.style.gridColumn = "";
+    });
+
+    if (window.matchMedia("(min-width: 561px)").matches) {
+      const leftCategories = new Set(["Career ledger", "Team trail"]);
+      const rightCategories = new Set(["Badges", "Personal file"]);
+      const cardSegments = cards.reduce((segments, card) => {
+        if (card.classList.contains("is-wide")) {
+          segments.push([]);
+        } else {
+          segments.at(-1).push(card);
+        }
+        return segments;
+      }, [[]]);
+      cardSegments.forEach((segment) => {
+        const hasLeftLane = segment.some((card) => leftCategories.has(card.dataset.category));
+        const hasRightLane = segment.some((card) => rightCategories.has(card.dataset.category));
+        if (!hasLeftLane || !hasRightLane) return;
+        segment.forEach((card) => {
+          if (leftCategories.has(card.dataset.category)) card.style.gridColumn = "1 / span 6";
+          if (rightCategories.has(card.dataset.category)) card.style.gridColumn = "7 / span 6";
+        });
+      });
+    }
+
+    cards.forEach((card) => {
+      const height = card.getBoundingClientRect().height;
+      const span = Math.ceil((height + rowGap) / (rowHeight + rowGap));
+      card.style.gridRowEnd = `span ${span}`;
+    });
+  });
 }
 
 function escapeHtml(value) {
@@ -499,6 +621,7 @@ function showStats() {
 }
 
 function bindEvents() {
+  window.addEventListener("resize", scheduleEvidenceLayout);
   el.poolPicker.addEventListener("click", (event) => {
     const button = event.target.closest("button[data-pool]");
     if (!button || button.dataset.pool === state.poolMode) return;
