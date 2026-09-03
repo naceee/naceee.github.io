@@ -510,14 +510,29 @@ function escapeHtml(value) {
 function filterRiders(query) {
   const search = normalize(query);
   if (!search) return [];
+
+  const matchScore = (rider) => {
+    const name = normalize(rider.name);
+    const surnameFirstName = normalize(rider.displayName || rider.name);
+    if (name.startsWith(search)) return 0;
+    if (surnameFirstName.startsWith(search)) return 1;
+    if (name.split(" ").some((word) => word.startsWith(search))) return 1;
+    return 2;
+  };
+  const poolAffinity = (rider) => {
+    if (state.poolMode === "top") return rider.topRank ? 0 : rider.level === "WT" ? 1 : 2;
+    if (state.poolMode === "wt") return rider.level === "WT" ? 0 : 1;
+    return 0;
+  };
+
   return state.riders
     .filter((rider) => normalize(rider.name).includes(search))
     .sort((a, b) => {
-      const aStarts = normalize(a.name).startsWith(search) ? 0 : 1;
-      const bStarts = normalize(b.name).startsWith(search) ? 0 : 1;
-      return aStarts - bStarts || a.name.localeCompare(b.name);
+      return matchScore(a) - matchScore(b)
+        || poolAffinity(a) - poolAffinity(b)
+        || a.name.localeCompare(b.name);
     })
-    .slice(0, 8);
+    .slice(0, 12);
 }
 
 function renderSuggestions() {
