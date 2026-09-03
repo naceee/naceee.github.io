@@ -355,7 +355,7 @@ function escapeHtml(value) {
 function filterRiders(query) {
   const search = normalize(query);
   if (!search) return [];
-  return getEligibleRiders()
+  return state.riders
     .filter((rider) => normalize(rider.name).includes(search))
     .sort((a, b) => {
       const aStarts = normalize(a.name).startsWith(search) ? 0 : 1;
@@ -380,7 +380,7 @@ function renderSuggestions() {
       <button class="suggestion" type="button" role="option" data-index="${index}" data-slug="${rider.slug}">
         <strong>${escapeHtml(rider.name)}</strong><span>${escapeHtml(rider.team)}</span>
       </button>`).join("")
-    : '<div class="suggestion-empty">No current WorldTour rider found.</div>';
+    : '<div class="suggestion-empty">No professional rider found.</div>';
 }
 
 function closeSuggestions() {
