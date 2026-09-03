@@ -55,6 +55,7 @@ const el = {
   pcsLink: document.querySelector("#pcs-link"),
   statsDialog: document.querySelector("#stats-dialog"),
   poolPicker: document.querySelector("#pool-picker"),
+  guessDockAnchor: document.querySelector("#guess-dock-anchor"),
 };
 
 const normalize = (value) => value
@@ -426,6 +427,7 @@ function renderCardBody(category, hints) {
 }
 
 let evidenceLayoutFrame = null;
+let guessDockFrame = null;
 
 function scheduleEvidenceLayout() {
   if (evidenceLayoutFrame) cancelAnimationFrame(evidenceLayoutFrame);
@@ -468,6 +470,37 @@ function scheduleEvidenceLayout() {
       card.style.gridRowEnd = `span ${span}`;
     });
   });
+}
+
+function syncMobileGuessDock() {
+  guessDockFrame = null;
+  const isMobile = window.matchMedia("(max-width: 560px)").matches;
+  if (!isMobile) {
+    el.form.classList.remove("is-mobile-docked");
+    el.guessDockAnchor.style.height = "";
+    delete el.guessDockAnchor.dataset.origin;
+    return;
+  }
+
+  if (!el.form.classList.contains("is-mobile-docked")) {
+    el.guessDockAnchor.dataset.origin = String(el.guessDockAnchor.getBoundingClientRect().top + window.scrollY);
+  }
+  const origin = Number(el.guessDockAnchor.dataset.origin);
+  const shouldDock = window.scrollY + 8 >= origin;
+  const isDocked = el.form.classList.contains("is-mobile-docked");
+
+  if (shouldDock && !isDocked) {
+    el.guessDockAnchor.style.height = `${el.form.getBoundingClientRect().height}px`;
+    el.form.classList.add("is-mobile-docked");
+  } else if (!shouldDock && isDocked) {
+    el.form.classList.remove("is-mobile-docked");
+    el.guessDockAnchor.style.height = "";
+  }
+}
+
+function scheduleMobileGuessDock() {
+  if (guessDockFrame) cancelAnimationFrame(guessDockFrame);
+  guessDockFrame = requestAnimationFrame(syncMobileGuessDock);
 }
 
 function escapeHtml(value) {
@@ -622,6 +655,8 @@ function showStats() {
 
 function bindEvents() {
   window.addEventListener("resize", scheduleEvidenceLayout);
+  window.addEventListener("resize", scheduleMobileGuessDock);
+  window.addEventListener("scroll", scheduleMobileGuessDock, { passive: true });
   el.poolPicker.addEventListener("click", (event) => {
     const button = event.target.closest("button[data-pool]");
     if (!button || button.dataset.pool === state.poolMode) return;
@@ -671,6 +706,7 @@ async function init() {
     const savedPool = localStorage.getItem("breakaway-pool");
     state.poolMode = ["top", "wt", "pro"].includes(savedPool) ? savedPool : "wt";
     startRound();
+    scheduleMobileGuessDock();
   } catch (error) {
     el.panel.setAttribute("aria-busy", "false");
     el.feedback.className = "guess-feedback is-wrong";

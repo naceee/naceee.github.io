@@ -9,8 +9,8 @@
     />
     <meta name="theme-color" content="#111d2a" />
     <title>Breakaway — Guess the rider</title>
-    <link rel="stylesheet" href="styles.css?v=progressive-rankings-1" />
-    <script type="module" src="app.js?v=progressive-rankings-1"></script>
+    <link rel="stylesheet" href="styles.css?v=mobile-dock-1" />
+    <script type="module" src="app.js?v=mobile-dock-1"></script>
   </head>
   <body>
     <a class="skip-link" href="#guess-input">Skip to the guess</a>
@@ -61,6 +61,7 @@
 
           <div class="progress-track" id="progress-track" aria-label="Round progress"></div>
 
+          <div class="guess-dock-anchor" id="guess-dock-anchor" aria-hidden="true"></div>
           <form class="guess-form" id="guess-form" autocomplete="off">
             <div class="combobox-wrap">
               <label for="guess-input">Make your guess</label>
@@ -79,7 +80,7 @@
               </div>
               <div class="suggestions" id="suggestions" role="listbox" hidden></div>
             </div>
-            <button class="primary-button" id="guess-button" type="submit" disabled>
+            <button class="primary-button" id="guess-button" type="submit" aria-label="Submit guess" disabled>
               <span>Submit guess</span><span aria-hidden="true">↗</span>
             </button>
           </form>

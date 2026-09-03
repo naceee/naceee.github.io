@@ -416,15 +416,53 @@ dialog::backdrop { background: rgba(17,29,42,.75); backdrop-filter: blur(5px); }
 }
 
 @media (max-width: 560px) {
+  body { padding-bottom: calc(12px + env(safe-area-inset-bottom)); }
   .header-meta { gap: 12px; }
   .season-tag { display: none; }
   .hero-copy h1 { letter-spacing: -.065em; }
   .game-hero::before { display: none; }
-  .round-heading h2 { font-size: 1.3rem; }
-  .progress-track { gap: 2px; }
+  .game-sidebar { position: static; }
+  .game-panel { padding: 17px 15px; }
+  .round-heading h2 { font-size: 1.12rem; }
+  .clue-counter strong { font-size: 1.7rem; }
+  .pool-picker { margin-top: 13px; }
+  .progress-track { gap: 2px; margin: 13px 0; }
   .round-actions { align-items: center; flex-direction: row; }
   .evidence-card, .evidence-card.is-wide { grid-column: 1 / -1; }
-  .guess-form { grid-template-columns: 1fr; }
+  .guess-dock-anchor { height: 0; }
+  .guess-form {
+    grid-template-columns: minmax(0, 1fr) 48px;
+    gap: 4px;
+  }
+  .guess-form .combobox-wrap label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+  .guess-form .input-shell input { font-size: 1rem; }
+  .guess-form .primary-button { width: 48px; padding: 0; gap: 0; }
+  .guess-form .primary-button span:first-child { display: none; }
+  .guess-form.is-mobile-docked {
+    position: fixed;
+    z-index: 50;
+    top: max(8px, env(safe-area-inset-top));
+    right: 10px;
+    left: 10px;
+    padding: 7px;
+    border: 1px solid var(--ink);
+    background: var(--ink);
+    box-shadow: 0 10px 30px rgba(17, 29, 42, .24);
+  }
+  .guess-form.is-mobile-docked .suggestions {
+    top: calc(100% + 5px);
+    max-height: min(260px, calc(100dvh - 82px));
+  }
   .bar-item { grid-template-columns: 74px 1fr 42px; }
   footer { flex-direction: column; padding-left: 20px; padding-right: 20px; }
   .result-dialog, .stats-dialog { padding: 36px 24px 26px; }
