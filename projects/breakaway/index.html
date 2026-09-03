@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Breakaway — a progressively harder-to-easier WorldTour rider guessing game."
+    />
+    <meta name="theme-color" content="#111d2a" />
+    <title>Breakaway — Guess the rider</title>
+    <link rel="stylesheet" href="styles.css?v=pools-1" />
+    <script type="module" src="app.js?v=pools-1"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#guess-input">Skip to the guess</a>
+
+    <header class="site-header">
+      <a class="brand" href="./" aria-label="Breakaway home">
+        <span class="brand-mark" aria-hidden="true">
+          <i></i><i></i><i></i>
+        </span>
+        <span>BREAKAWAY</span>
+      </a>
+      <div class="header-meta">
+        <span class="season-tag">MEN · 2026</span>
+        <button class="text-button" id="stats-button" type="button">Your stats</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="game-hero" aria-labelledby="game-title">
+        <div class="eyebrow"><span>RIDER 001</span><span id="rider-count">Loading peloton…</span></div>
+        <div class="hero-copy">
+          <h1 id="game-title">Who’s in the<br /><em>breakaway?</em></h1>
+          <p>One professional rider. Every round deals two or three weighted clues from across their career.</p>
+        </div>
+      </section>
+
+      <div class="play-layout">
+        <aside class="game-sidebar">
+          <div class="game-panel" id="game-panel" aria-busy="true">
+          <div class="round-heading">
+            <div>
+              <span class="round-kicker">MYSTERY RIDER</span>
+              <h2>Unknown rider</h2>
+            </div>
+            <div class="clue-counter" aria-live="polite">
+              <strong id="clue-number">—</strong>
+              <span>ROUND</span>
+            </div>
+          </div>
+
+          <fieldset class="pool-picker" id="pool-picker">
+            <legend>Rider pool</legend>
+            <div>
+              <button type="button" data-pool="top" aria-pressed="false"><strong>Top</strong><span id="top-pool-count">30</span></button>
+              <button type="button" data-pool="wt" aria-pressed="true"><strong>WorldTour</strong><span id="wt-pool-count">—</span></button>
+              <button type="button" data-pool="pro" aria-pressed="false"><strong>All pro</strong><span id="pro-pool-count">—</span></button>
+            </div>
+          </fieldset>
+
+          <div class="progress-track" id="progress-track" aria-label="Round progress"></div>
+
+          <form class="guess-form" id="guess-form" autocomplete="off">
+            <div class="combobox-wrap">
+              <label for="guess-input">Make your guess</label>
+              <div class="input-shell">
+                <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m21 21-4.7-4.7m2.2-5.8a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z" /></svg>
+                <input
+                  id="guess-input"
+                  role="combobox"
+                  aria-autocomplete="list"
+                  aria-controls="suggestions"
+                  aria-expanded="false"
+                  placeholder="Type a rider’s name…"
+                  spellcheck="false"
+                  disabled
+                />
+              </div>
+              <div class="suggestions" id="suggestions" role="listbox" hidden></div>
+            </div>
+            <button class="primary-button" id="guess-button" type="submit" disabled>
+              <span>Submit guess</span><span aria-hidden="true">↗</span>
+            </button>
+          </form>
+
+          <div class="guess-feedback" id="guess-feedback" aria-live="assertive"></div>
+          <div class="round-actions">
+            <button class="skip-button" id="skip-button" type="button" disabled>Skip guess — next round</button>
+            <button class="reveal-button" id="reveal-button" type="button" disabled>Reveal rider</button>
+          </div>
+          </div>
+        </aside>
+
+        <section class="evidence-section" aria-labelledby="evidence-title">
+          <div class="section-heading">
+            <div>
+              <span class="eyebrow-label">THE EVIDENCE BOARD</span>
+              <h2 id="evidence-title">Clues collect here.</h2>
+            </div>
+            <p>Each round draws a varied batch. Hard clues are common; giveaways are rare.</p>
+          </div>
+
+          <div class="evidence-grid" id="evidence-grid">
+            <div class="empty-state" id="empty-state">
+              <div class="empty-wheel" aria-hidden="true"><span></span></div>
+              <p>Your first clues are rolling in…</p>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <footer>
+      <p>Rider data sourced from <a href="https://www.procyclingstats.com/" target="_blank" rel="noreferrer">ProCyclingStats</a>. Snapshot: September 2026.</p>
+      <p>Built for cycling obsessives.</p>
+    </footer>
+
+    <dialog class="result-dialog" id="result-dialog">
+      <div class="dialog-stripe" aria-hidden="true"></div>
+      <button class="dialog-close" id="dialog-close" type="button" aria-label="Close">×</button>
+      <span class="dialog-kicker" id="dialog-kicker">RIDER FOUND</span>
+      <h2 id="dialog-title">That’s the rider.</h2>
+      <div class="rider-reveal">
+        <span class="rider-number" id="result-attempts">01</span>
+        <div>
+          <strong id="result-name"></strong>
+          <span id="result-meta"></span>
+        </div>
+      </div>
+      <p id="dialog-message"></p>
+      <div class="dialog-actions">
+        <a id="pcs-link" class="secondary-button" href="#" target="_blank" rel="noreferrer">View on PCS ↗</a>
+        <button class="primary-button" id="next-rider-button" type="button">Next rider <span aria-hidden="true">→</span></button>
+      </div>
+    </dialog>
+
+    <dialog class="stats-dialog" id="stats-dialog">
+      <button class="dialog-close" id="stats-close" type="button" aria-label="Close">×</button>
+      <span class="dialog-kicker">YOUR PALMARÈS</span>
+      <h2>Local form</h2>
+      <div class="stats-grid">
+        <div><strong id="stat-played">0</strong><span>Played</span></div>
+        <div><strong id="stat-wins">0</strong><span>Solved</span></div>
+        <div><strong id="stat-average">—</strong><span>Avg. rounds</span></div>
+        <div><strong id="stat-streak">0</strong><span>Streak</span></div>
+      </div>
+      <button class="primary-button" id="stats-done" type="button">Back to the race</button>
+    </dialog>
+
+    <noscript>This game needs JavaScript enabled.</noscript>
+  </body>
+</html>
