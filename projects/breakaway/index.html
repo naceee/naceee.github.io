@@ -9,8 +9,8 @@
     />
     <meta name="theme-color" content="#111d2a" />
     <title>Breakaway — Guess the rider</title>
-    <link rel="stylesheet" href="styles.css?v=pools-1" />
-    <script type="module" src="app.js?v=pools-1"></script>
+    <link rel="stylesheet" href="styles.css?v=cleaner-1" />
+    <script type="module" src="app.js?v=cleaner-1"></script>
   </head>
   <body>
     <a class="skip-link" href="#guess-input">Skip to the guess</a>
@@ -30,10 +30,9 @@
 
     <main>
       <section class="game-hero" aria-labelledby="game-title">
-        <div class="eyebrow"><span>RIDER 001</span><span id="rider-count">Loading peloton…</span></div>
+        <div class="eyebrow"><span>RIDER 001</span></div>
         <div class="hero-copy">
           <h1 id="game-title">Who’s in the<br /><em>breakaway?</em></h1>
-          <p>One professional rider. Every round deals two or three weighted clues from across their career.</p>
         </div>
       </section>
 
@@ -95,11 +94,7 @@
 
         <section class="evidence-section" aria-labelledby="evidence-title">
           <div class="section-heading">
-            <div>
-              <span class="eyebrow-label">THE EVIDENCE BOARD</span>
-              <h2 id="evidence-title">Clues collect here.</h2>
-            </div>
-            <p>Each round draws a varied batch. Hard clues are common; giveaways are rare.</p>
+            <span class="eyebrow-label" id="evidence-title">THE EVIDENCE BOARD</span>
           </div>
 
           <div class="evidence-grid" id="evidence-grid">

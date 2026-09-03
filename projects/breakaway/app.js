@@ -34,7 +34,6 @@ const state = {
 
 const el = {
   panel: document.querySelector("#game-panel"),
-  riderCount: document.querySelector("#rider-count"),
   clueNumber: document.querySelector("#clue-number"),
   progress: document.querySelector("#progress-track"),
   form: document.querySelector("#guess-form"),
@@ -123,7 +122,7 @@ function buildHintPool(rider) {
       "result",
       result.race,
       `${placing}${result.kind ? ` · ${result.kind}` : ""}`,
-      result.year ? String(result.year) : "career result",
+      "",
       {
         weight: numericPlacing <= 1 ? 3.5 : numericPlacing <= 3 ? 4.5 : 6.5,
         difficulty: numericPlacing <= 1 ? 2 : numericPlacing <= 3 ? 2.5 : 3.5,
@@ -141,7 +140,7 @@ function buildHintPool(rider) {
   for (const oldTeam of oldTeams.slice(0, 3)) {
     personal.push(makeHint("Team trail", "team", `${oldTeam.season} team`, oldTeam.name, oldTeam.level || "former team"));
   }
-  if (rider.birthPlace) personal.push(makeHint("Personal file", "personal", "Place of birth", rider.birthPlace, "profile birthplace"));
+  if (rider.birthPlace) personal.push(makeHint("Personal file", "personal", "Place of birth", rider.birthPlace));
 
   const identityHints = [
     makeHint("Personal file", "identity", "Nationality", rider.nationality || rider.countryCode.toUpperCase(), "low-probability identity clue"),
@@ -248,8 +247,6 @@ function renderPoolPicker() {
   el.poolPicker.querySelectorAll("button").forEach((button) => {
     button.setAttribute("aria-pressed", String(button.dataset.pool === state.poolMode));
   });
-  const labels = { top: "TOP RIDERS", wt: "WORLDTOUR RIDERS", pro: "PRO RIDERS" };
-  el.riderCount.textContent = `${counts[state.poolMode]} ${labels[state.poolMode]} IN THE DRAW`;
 }
 
 function startRound() {
@@ -342,13 +339,13 @@ function renderCardBody(category, hints) {
     `).join("")}</div>`;
   }
   if (category === "Selected results") {
-    return `<div>${hints.map((hint) => `<span class="result-chip"><b>${escapeHtml(String(hint.value))}</b>${escapeHtml(hint.title)} · ${escapeHtml(hint.detail)}</span>`).join("")}</div>`;
+    return `<div>${hints.map((hint) => `<span class="result-chip"><b>${escapeHtml(String(hint.value))}</b>${escapeHtml(hint.title)}${hint.detail ? ` · ${escapeHtml(hint.detail)}` : ""}</span>`).join("")}</div>`;
   }
   if (category === "Badges") {
     return `<div>${hints.map((hint) => `<span class="badge-chip">◆ ${escapeHtml(hint.title)}</span>`).join("")}</div>`;
   }
   return `<ul class="clue-list">${hints.map((hint) => {
-    return `<li class="clue-row"><span class="clue-index">R${hint.round}</span><div><strong>${escapeHtml(hint.title)} — ${escapeHtml(String(hint.value))}</strong><p>${escapeHtml(hint.detail)}</p></div></li>`;
+    return `<li class="clue-row"><span class="clue-index">R${hint.round}</span><div><strong>${escapeHtml(hint.title)} — ${escapeHtml(String(hint.value))}</strong>${hint.detail ? `<p>${escapeHtml(hint.detail)}</p>` : ""}</div></li>`;
   }).join("")}</ul>`;
 }
 

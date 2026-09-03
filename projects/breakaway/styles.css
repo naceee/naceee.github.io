@@ -112,10 +112,7 @@ main { overflow: clip; }
   letter-spacing: .12em;
 }
 .hero-copy {
-  display: grid;
-  grid-template-columns: 1.25fr .8fr;
-  gap: 40px;
-  align-items: end;
+  display: block;
 }
 .hero-copy h1 {
   max-width: 760px;
@@ -131,13 +128,6 @@ main { overflow: clip; }
   font-weight: 400;
   text-transform: none;
 }
-.hero-copy p {
-  margin: 0 0 4px;
-  max-width: 380px;
-  font-size: .92rem;
-  line-height: 1.55;
-}
-
 .play-layout {
   max-width: 1280px;
   margin: 0 auto;
@@ -290,9 +280,7 @@ main { overflow: clip; }
 .skip-button:disabled, .reveal-button:disabled { cursor: not-allowed; opacity: .35; }
 
 .evidence-section { background: #e8e5dc; border: 1px solid var(--ink); padding: 24px; min-height: 520px; }
-.section-heading { display: grid; grid-template-columns: 1fr .8fr; gap: 24px; align-items: end; margin-bottom: 20px; }
-.section-heading h2 { margin: 5px 0 0; font-size: clamp(1.85rem, 3vw, 2.8rem); letter-spacing: -.055em; }
-.section-heading p { max-width: 300px; margin: 0 0 3px auto; color: var(--muted); font-size: .78rem; line-height: 1.45; }
+.section-heading { display: block; margin-bottom: 20px; }
 .evidence-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 14px; align-items: start; }
 .empty-state {
   grid-column: 1 / -1;
@@ -396,7 +384,6 @@ dialog::backdrop { background: rgba(17,29,42,.75); backdrop-filter: blur(5px); }
 @media (max-width: 820px) {
   .site-header, .game-hero { padding-left: 20px; padding-right: 20px; }
   .game-hero { padding-top: 34px; }
-  .hero-copy, .section-heading { grid-template-columns: 1fr; gap: 24px; }
   .hero-copy h1 { font-size: clamp(3.4rem, 15vw, 6rem); }
   .play-layout { grid-template-columns: 1fr; padding: 0 20px 58px; }
   .game-sidebar { top: 0; }
@@ -404,7 +391,6 @@ dialog::backdrop { background: rgba(17,29,42,.75); backdrop-filter: blur(5px); }
   .guess-form { grid-template-columns: 1fr auto; }
   .primary-button { justify-content: center; }
   .evidence-section { padding: 22px 20px 30px; }
-  .section-heading p { margin-left: 0; }
   .evidence-card { grid-column: span 6; }
   .evidence-card.is-wide { grid-column: 1 / -1; }
 }
